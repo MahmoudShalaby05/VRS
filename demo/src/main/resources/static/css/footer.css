@@ -1,0 +1,21 @@
+/* Footer styles */
+footer a {
+    transition: all 0.3s ease;
+}
+
+footer a:hover {
+    transform: translateX(2px);
+}
+
+footer .social-icon {
+    transition: all 0.3s ease;
+}
+
+footer .social-icon:hover {
+    transform: translateY(-2px);
+}
+
+/* Footer Logo */
+footer img {
+    transition: all 0.3s ease;
+}

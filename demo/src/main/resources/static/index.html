@@ -1,10 +1,545 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Vehicle Rent System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed - Premium Vehicle Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
-<body>
-    <h1>Welcome to Vehicle Rent System 🚗</h1>
-    <p>Spring Boot + HTML working!</p>
+<body class="font-inter bg-white text-gray-900">
+
+    <!-- Navbar Container -->
+    <div id="navbar-container"></div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
+        <div class="absolute inset-0 hero-bg"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent"></div>
+        
+        <div class="absolute top-20 right-20 w-72 h-72 bg-darkRed/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute bottom-20 left-1/3 w-96 h-96 bg-red-900/10 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 w-full">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
+                        <span class="w-2 h-2 bg-darkRed rounded-full animate-pulse"></span>
+                        <span class="text-white/90 text-sm font-medium">Premium Vehicle Rental</span>
+                    </div>
+
+                    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight">
+                        Drive Your
+                        <span class="text-darkRed">Dream</span>
+                        Car Today
+                    </h1>
+
+                    <p class="text-lg text-white/70 max-w-lg leading-relaxed">
+                        Flexible subscriptions, no long-term commitments. Choose from our premium fleet and drive away in minutes.
+                    </p>
+
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 space-y-4 search-glass">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-white/60 text-sm mb-1 block">Pick-up Location</label>
+                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-darkRed"></i>
+                                    <input type="text" placeholder="Enter location" class="bg-transparent text-white placeholder-white/40 outline-none w-full text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-sm mb-1 block">Pick-up Date</label>
+                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-darkRed"></i>
+                                    <input type="date" class="bg-transparent text-white outline-none w-full text-sm date-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-white/60 text-sm mb-1 block">Return Date</label>
+                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-darkRed"></i>
+                                    <input type="date" class="bg-transparent text-white outline-none w-full text-sm date-input">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-white/60 text-sm mb-1 block">Vehicle Type</label>
+                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
+                                    <i data-lucide="car" class="w-4 h-4 text-darkRed"></i>
+                                    <select class="bg-transparent text-white outline-none w-full text-sm appearance-none">
+                                        <option value="" class="text-gray-900">All Types</option>
+                                        <option value="sedan" class="text-gray-900">Sedan</option>
+                                        <option value="suv" class="text-gray-900">SUV</option>
+                                        <option value="luxury" class="text-gray-900">Luxury</option>
+                                        <option value="sports" class="text-gray-900">Sports</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="navigateToVehicles()" class="w-full bg-darkRed hover:bg-red-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-red-900/40 flex items-center justify-center gap-2">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            Search Vehicles
+                        </button>
+                    </div>
+
+                    <div class="flex gap-8 pt-4">
+                        <div>
+                            <p class="text-3xl font-bold text-white">500+</p>
+                            <p class="text-white/50 text-sm">Vehicles</p>
+                        </div>
+                        <div>
+                            <p class="text-3xl font-bold text-white">50K+</p>
+                            <p class="text-white/50 text-sm">Happy Drivers</p>
+                        </div>
+                        <div>
+                            <p class="text-3xl font-bold text-white">25+</p>
+                            <p class="text-white/50 text-sm">Cities</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden lg:flex justify-center items-center relative">
+                    <div class="absolute inset-0 bg-darkRed/20 rounded-full blur-3xl scale-75"></div>
+                    <img src="http://static.photos/automotive/640x360/1" alt="Premium Car" class="relative rounded-3xl shadow-2xl shadow-black/50 hero-car-img">
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <i data-lucide="chevron-down" class="w-6 h-6 text-white/50"></i>
+        </div>
+    </section>
+
+    <!-- Brands Strip -->
+    <section class="bg-gray-50 py-8 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-40">
+                <span class="text-2xl font-bold tracking-wider">TOYOTA</span>
+                <span class="text-2xl font-bold tracking-wider">BMW</span>
+                <span class="text-2xl font-bold tracking-wider">MERCEDES</span>
+                <span class="text-2xl font-bold tracking-wider">AUDI</span>
+                <span class="text-2xl font-bold tracking-wider">NISSAN</span>
+                <span class="text-2xl font-bold tracking-wider">HONDA</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-darkRed font-semibold text-sm uppercase tracking-wider">Simple Process</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-4">How It <span class="text-darkRed">Works</span></h2>
+                <p class="text-gray-500 text-lg">Get behind the wheel in just 3 simple steps. No paperwork, no hassle.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative bg-white rounded-3xl p-8 text-center group hover:shadow-2xl transition-all duration-500 border border-gray-100 step-card">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-darkRed text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">1</div>
+                    <div class="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-darkRed group-hover:scale-110 transition-all duration-300">
+                        <i data-lucide="search" class="w-10 h-10 text-darkRed group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Choose Your Car</h3>
+                    <p class="text-gray-500">Browse our extensive fleet and find the perfect vehicle that matches your style and needs.</p>
+                </div>
+
+                <div class="relative bg-white rounded-3xl p-8 text-center group hover:shadow-2xl transition-all duration-500 border border-gray-100 step-card">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-darkRed text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</div>
+                    <div class="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-darkRed group-hover:scale-110 transition-all duration-300">
+                        <i data-lucide="credit-card" class="w-10 h-10 text-darkRed group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Book & Pay</h3>
+                    <p class="text-gray-500">Complete your booking with secure payment. No hidden fees, no long-term commitment required.</p>
+                </div>
+
+                <div class="relative bg-white rounded-3xl p-8 text-center group hover:shadow-2xl transition-all duration-500 border border-gray-100 step-card">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-darkRed text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">3</div>
+                    <div class="w-20 h-20 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-darkRed group-hover:scale-110 transition-all duration-300">
+                        <i data-lucide="key-round" class="w-10 h-10 text-darkRed group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Pick Up & Drive</h3>
+                    <p class="text-gray-500">Pick up your car and hit the road! Enjoy the freedom of driving your chosen vehicle.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="py-24 bg-darkRed relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-red-800/30 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-red-900/30 rounded-full blur-3xl"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <span class="text-red-200 font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
+                    <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-6 text-white">The <span class="text-red-200">Smartest</span> Way To Rent</h2>
+                    <p class="text-red-100/70 text-lg mb-10">We're revolutionizing the car rental experience with flexibility, transparency, and premium service.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4 items-start group">
+                            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-darkRed transition-all duration-300">
+                                <i data-lucide="shield-check" class="w-6 h-6 text-white group-hover:text-darkRed transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg mb-1">Full Insurance Coverage</h4>
+                                <p class="text-red-100/60">Comprehensive insurance included in every rental. Drive with complete peace of mind.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start group">
+                            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-darkRed transition-all duration-300">
+                                <i data-lucide="clock" class="w-6 h-6 text-white group-hover:text-darkRed transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg mb-1">Flexible Duration</h4>
+                                <p class="text-red-100/60">Rent for a day, a week, or a month. Cancel anytime without penalties.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start group">
+                            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-darkRed transition-all duration-300">
+                                <i data-lucide="truck" class="w-6 h-6 text-white group-hover:text-darkRed transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg mb-1">Free Delivery</h4>
+                                <p class="text-red-100/60">We deliver the car to your doorstep. No need to visit a rental office.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 items-start group">
+                            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-darkRed transition-all duration-300">
+                                <i data-lucide="headphones" class="w-6 h-6 text-white group-hover:text-darkRed transition-colors"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg mb-1">24/7 Roadside Support</h4>
+                                <p class="text-red-100/60">Our support team is always available. Get help anytime, anywhere.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <img src="http://static.photos/automotive/640x360/5" alt="Car" class="rounded-3xl shadow-2xl shadow-black/30">
+                    <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-xl max-w-xs">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Booking Confirmed!</p>
+                                <p class="text-gray-400 text-xs">Just now</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-xs">BMW X5 - Dec 20 to Dec 27</p>
+                    </div>
+                    <div class="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-xl">
+                        <div class="flex items-center gap-1 mb-1">
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                            <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium">4.9 / 5 Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-darkRed font-semibold text-sm uppercase tracking-wider">Pricing Plans</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-4">Simple & <span class="text-darkRed">Transparent</span> Pricing</h2>
+                <p class="text-gray-500 text-lg">No hidden fees. Choose the plan that works best for you.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Daily -->
+                <div class="bg-white border-2 border-gray-100 rounded-3xl p-8 hover:border-darkRed/30 transition-all duration-300 hover:shadow-xl group">
+                    <div class="text-center mb-8">
+                        <i data-lucide="sun" class="w-10 h-10 text-darkRed mx-auto mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Daily</h3>
+                        <p class="text-gray-400 text-sm mb-4">Perfect for short trips</p>
+                        <div class="flex items-end justify-center gap-1">
+                            <span class="text-5xl font-black text-darkRed">$49</span>
+                            <span class="text-gray-400 mb-2">/day</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Basic insurance</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> 200km/day mileage</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Roadside assistance</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i data-lucide="x" class="w-5 h-5"></i> Free delivery</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i data-lucide="x" class="w-5 h-5"></i> Premium support</li>
+                    </ul>
+                    <button onclick="navigateToVehicles()" class="w-full border-2 border-darkRed text-darkRed hover:bg-darkRed hover:text-white py-3 rounded-xl font-semibold transition-all duration-300">
+                        Choose Plan
+                    </button>
+                </div>
+
+                <!-- Weekly - Popular -->
+                <div class="bg-darkRed text-white rounded-3xl p-8 relative shadow-2xl shadow-red-900/30 scale-105">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
+                        Most Popular
+                    </div>
+                    <div class="text-center mb-8">
+                        <i data-lucide="calendar" class="w-10 h-10 text-red-200 mx-auto mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Weekly</h3>
+                        <p class="text-red-200/70 text-sm mb-4">Best value for vacations</p>
+                        <div class="flex items-end justify-center gap-1">
+                            <span class="text-5xl font-black">$199</span>
+                            <span class="text-red-200/70 mb-2">/week</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Full insurance</li>
+                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Unlimited mileage</li>
+                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Roadside assistance</li>
+                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Free delivery</li>
+                        <li class="flex items-center gap-3 text-red-300"><i data-lucide="x" class="w-5 h-5"></i> Premium support</li>
+                    </ul>
+                    <button onclick="navigateToVehicles()" class="w-full bg-white text-darkRed hover:bg-gray-100 py-3 rounded-xl font-semibold transition-all duration-300">
+                        Choose Plan
+                    </button>
+                </div>
+
+                <!-- Monthly -->
+                <div class="bg-white border-2 border-gray-100 rounded-3xl p-8 hover:border-darkRed/30 transition-all duration-300 hover:shadow-xl group">
+                    <div class="text-center mb-8">
+                        <i data-lucide="calendar-range" class="w-10 h-10 text-darkRed mx-auto mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">Monthly</h3>
+                        <p class="text-gray-400 text-sm mb-4">For the long haul</p>
+                        <div class="flex items-end justify-center gap-1">
+                            <span class="text-5xl font-black text-darkRed">$599</span>
+                            <span class="text-gray-400 mb-2">/month</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Full insurance</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Unlimited mileage</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Roadside assistance</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Free delivery</li>
+                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Premium support</li>
+                    </ul>
+                    <button onclick="navigateToVehicles()" class="w-full border-2 border-darkRed text-darkRed hover:bg-darkRed hover:text-white py-3 rounded-xl font-semibold transition-all duration-300">
+                        Choose Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-darkRed font-semibold text-sm uppercase tracking-wider">Testimonials</span>
+                <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-4">What Our <span class="text-darkRed">Drivers</span> Say</h2>
+                <p class="text-gray-500 text-lg">Real experiences from real customers who love DriveRed.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">"Absolutely amazing service! The car was delivered right to my hotel, and the whole process was seamless. Will definitely use DriveRed again."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/10" alt="Sarah" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold">Sarah Johnson</p>
+                            <p class="text-gray-400 text-sm">Dubai, UAE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">"Best car rental experience I've ever had. The monthly subscription saved me so much money compared to traditional rentals. Highly recommended!"</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/22" alt="Ahmed" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold">Ahmed Al-Rashid</p>
+                            <p class="text-gray-400 text-sm">Abu Dhabi, UAE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">"The premium fleet is incredible. Drove a BMW X5 for a week and it was flawless. The insurance coverage gave me total peace of mind."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/35" alt="Michael" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold">Michael Chen</p>
+                            <p class="text-gray-400 text-sm">Sharjah, UAE</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 bg-darkRed relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-40 h-40 border-2 border-white rounded-full"></div>
+            <div class="absolute bottom-10 right-10 w-60 h-60 border-2 border-white rounded-full"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-white rounded-full"></div>
+        </div>
+        <div class="relative max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-6">Ready To Hit The <span class="text-red-200">Road</span>?</h2>
+            <p class="text-red-100/70 text-lg mb-10 max-w-2xl mx-auto">Join thousands of happy drivers who chose the smarter way to rent. Get started today and drive your dream car.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="navigateToVehicles()" class="bg-white text-darkRed hover:bg-gray-100 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:shadow-xl flex items-center justify-center gap-2">
+                    <i data-lucide="car" class="w-5 h-5"></i>
+                    Browse Vehicles
+                </button>
+                <button onclick="navigateToContact()" class="border-2 border-white text-white hover:bg-white hover:text-darkRed px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2">
+                    <i data-lucide="phone" class="w-5 h-5"></i>
+                    Contact Us
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16">
+                <div>
+                    <span class="text-darkRed font-semibold text-sm uppercase tracking-wider">Get In Touch</span>
+                    <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-6">Have A <span class="text-darkRed">Question</span>?</h2>
+                    <p class="text-gray-500 text-lg mb-10">Our team is ready to help you find the perfect vehicle and answer any questions you may have.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-darkRed"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold">Visit Us</p>
+                                <p class="text-gray-500">123 Sheikh Zayed Road, Dubai, UAE</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="phone" class="w-6 h-6 text-darkRed"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold">Call Us</p>
+                                <p class="text-gray-500">+971 4 123 4567</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <i data-lucide="mail" class="w-6 h-6 text-darkRed"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold">Email Us</p>
+                                <p class="text-gray-500">hello@drivered.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-3xl p-8">
+                    <form onsubmit="handleContact(event)" class="space-y-6">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">First Name</label>
+                                <input type="text" placeholder="John" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">Last Name</label>
+                                <input type="text" placeholder="Doe" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block">Email</label>
+                            <input type="email" placeholder="john@example.com" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block">Message</label>
+                            <textarea rows="4" placeholder="How can we help?" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all resize-none" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-darkRed hover:bg-red-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-900/30 flex items-center justify-center gap-2">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal('signupModal')"></div>
+        <div class="relative bg-white rounded-3xl max-w-md w-full p-8 animate-scale-in">
+            <button onclick="closeModal('signupModal')" class="absolute top-4 right-4 w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="car" class="w-8 h-8 text-darkRed"></i>
+                </div>
+                <h3 class="text-2xl font-bold">Get Started</h3>
+                <p class="text-gray-500 mt-1">Create your DriveRed account</p>
+            </div>
+            <form onsubmit="handleSignup(event)" class="space-y-4">
+                <input type="text" placeholder="Full Name" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                <input type="email" placeholder="Email Address" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                <input type="tel" placeholder="Phone Number" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                <input type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-darkRed focus:ring-2 focus:ring-darkRed/20 outline-none transition-all" required>
+                <button type="submit" class="w-full bg-darkRed hover:bg-red-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300">
+                    Create Account
+                </button>
+            </form>
+            <p class="text-center text-gray-400 text-sm mt-4">Already have an account? <a href="login.html" class="text-darkRed font-semibold">Sign In</a></p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-[200] transform translate-y-20 opacity-0 transition-all duration-500">
+        <div class="bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i>
+            <span id="toastMessage">Success!</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

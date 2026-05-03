@@ -1,0 +1,64 @@
+/* === Navbar === */
+#navbar {
+    background: transparent;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+#navbar.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+}
+
+.nav-logo-text {
+    color: white;
+    transition: color 0.3s ease;
+}
+
+#navbar.scrolled .nav-logo-text {
+    color: #111827;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: white;
+}
+
+#navbar.scrolled .nav-link {
+    color: #4B5563;
+}
+
+#navbar.scrolled .nav-link:hover {
+    color: #8B0000;
+}
+
+/* === Navbar Logo Image === */
+#navbar img {
+    transition: all 0.3s ease;
+}
+
+/* If logo is white/light, invert on scroll to make it visible on white background */
+#navbar.scrolled img {
+    /* Uncomment if your logo is white/light colored */
+    /* filter: brightness(0); */
+}
+
+/* Mobile Menu Animation */
+#mobileMenu {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

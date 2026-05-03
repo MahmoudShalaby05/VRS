@@ -1,0 +1,59 @@
+/* === Hero Section === */
+.hero-bg {
+    background: linear-gradient(135deg, #1a0000 0%, #2d0a0a 25%, #0a0a0a 50%, #1a0505 75%, #0d0000 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.hero-car-img {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* === Step Cards === */
+.step-card {
+    transition: all 0.5s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(139, 0, 0, 0.2);
+}
+
+/* === Date Input Styling === */
+.date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* === Search Box Glass Effect === */
+.search-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 768px) {
+    .hero-car-img {
+        animation: none;
+    }
+
+    h1 {
+        font-size: 2.5rem !important;
+    }
+
+    h2 {
+        font-size: 2rem !important;
+    }
+}

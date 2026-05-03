@@ -1,0 +1,108 @@
+/* === Custom Properties === */
+:root {
+    --dark-red: #8B0000;
+    --dark-red-hover: #6B0000;
+    --red-800: #991B1B;
+    --red-50: #FEF2F2;
+}
+
+/* === Tailwind Custom Colors === */
+.bg-darkRed { background-color: #8B0000; }
+.hover\:bg-red-800:hover { background-color: #991B1B; }
+.text-darkRed { color: #8B0000; }
+.border-darkRed { border-color: #8B0000; }
+.focus\:border-darkRed:focus { border-color: #8B0000; }
+.focus\:ring-darkRed\/20:focus { --tw-ring-color: rgba(139, 0, 0, 0.2); }
+.bg-red-50 { background-color: #FEF2F2; }
+.text-red-200 { color: #FECACA; }
+.hover\:text-darkRed:hover { color: #8B0000; }
+.hover\:border-darkRed\/30:hover { border-color: rgba(139, 0, 0, 0.3); }
+.shadow-red-900\/30 { --tw-shadow-color: rgba(139, 0, 0, 0.3); }
+.shadow-red-900\/40 { --tw-shadow-color: rgba(139, 0, 0, 0.4); }
+.bg-darkRed\/20 { background-color: rgba(139, 0, 0, 0.2); }
+
+/* === Base Styles === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* === Animations === */
+.animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.delay-1000 {
+    animation-delay: 1s;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* === Section Reveal Animation === */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F3F4F6;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #8B0000;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6B0000;
+}
+
+/* === Selection Color === */
+::selection {
+    background: rgba(139, 0, 0, 0.2);
+    color: #8B0000;
+}
+
+/* === Logo Styles === */
+.logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-img-white {
+    filter: brightness(0) invert(1);
+}
