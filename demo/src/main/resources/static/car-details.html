@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed - Car Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/car-details.css">
+</head>
+<body class="font-inter bg-gray-50 text-gray-900">
+    <div id="navbar-container"></div>
+
+    <section class="details-hero">
+        <div class="hero-mask"></div>
+        <img id="heroImage" src="http://static.photos/automotive/1280x720/7" alt="Car" class="details-hero-img">
+        <div class="details-hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <a href="/vehicles.html" class="back-link">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Back to vehicles
+            </a>
+            <p id="carTypeBadge" class="type-badge mt-4">Luxury</p>
+            <h1 id="carName" class="text-5xl font-black text-white mt-4">Car Name</h1>
+            <p id="carTagline" class="text-white/80 text-lg max-w-2xl mt-3">Premium ride details</p>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid lg:grid-cols-[1.5fr_1fr] gap-8">
+        <section class="space-y-6">
+            <article class="panel">
+                <h2 class="panel-title">Overview</h2>
+                <p id="carDescription" class="text-gray-600 leading-relaxed"></p>
+            </article>
+
+            <article class="panel">
+                <h2 class="panel-title">Specs & Features</h2>
+                <div class="spec-grid" id="specGrid"></div>
+            </article>
+
+            <article class="panel">
+                <h2 class="panel-title">Why this car in Egypt?</h2>
+                <div id="egyptReasons" class="space-y-3 text-gray-600"></div>
+            </article>
+        </section>
+
+        <aside class="booking-card">
+            <p class="text-sm text-gray-500">Daily price</p>
+            <p class="text-4xl font-black text-darkRed" id="carPrice">$0</p>
+            <p class="text-sm text-gray-400 mb-5">Taxes and insurance included</p>
+
+            <div class="space-y-3">
+                <label class="field-shell">
+                    <span>Pickup date</span>
+                    <input type="date">
+                </label>
+                <label class="field-shell">
+                    <span>Return date</span>
+                    <input type="date">
+                </label>
+                <label class="field-shell">
+                    <span>Pickup city</span>
+                    <select>
+                        <option>Cairo</option>
+                        <option>Alexandria</option>
+                        <option>Giza</option>
+                        <option>Sharm El-Sheikh</option>
+                    </select>
+                </label>
+            </div>
+
+            <button class="book-btn mt-5">
+                <i data-lucide="calendar-check-2" class="w-5 h-5"></i>
+                Reserve this car
+            </button>
+            <button class="whatsapp-btn mt-3">
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                Chat with advisor
+            </button>
+        </aside>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/components.js"></script>
+    <script src="js/cars-data.js"></script>
+    <script src="js/car-details.js"></script>
+</body>
+</html>

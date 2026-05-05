@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed - Explore Cars</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/vehicles.css">
+</head>
+<body class="font-inter bg-gray-50 text-gray-900">
+    <div id="navbar-container"></div>
+
+    <section class="relative min-h-[82vh] flex items-center overflow-hidden">
+        <video class="hero-video" autoplay muted loop playsinline poster="http://static.photos/automotive/1280x720/9">
+            <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-road-1579/1080p.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 w-full">
+            <div class="grid lg:grid-cols-2 gap-10 items-center">
+                <div class="space-y-6">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white/90 text-sm">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-darkRed"></i>
+                        Premium Car Rentals
+                    </span>
+                    <h1 class="text-white text-5xl sm:text-6xl font-black leading-tight">
+                        From smart city drives to executive luxury rides
+                    </h1>
+                    <p class="text-white/80 text-lg max-w-xl">
+                        Discover cars that match your style, your route, and your budget in one beautiful search experience.
+                    </p>
+                    <div class="flex flex-wrap gap-3 text-sm">
+                        <span class="hero-tag">No hidden fees</span>
+                        <span class="hero-tag">24/7 support</span>
+                        <span class="hero-tag">Flexible cancellations</span>
+                    </div>
+                </div>
+
+                <div class="search-panel">
+                    <h2 class="text-2xl font-bold text-white mb-6">Start your trip</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="input-shell">
+                            <span>Pickup city</span>
+                            <input type="text" placeholder="Riyadh">
+                        </label>
+                        <label class="input-shell">
+                            <span>Pickup date</span>
+                            <input type="date">
+                        </label>
+                        <label class="input-shell">
+                            <span>Return date</span>
+                            <input type="date">
+                        </label>
+                        <label class="input-shell">
+                            <span>Car category</span>
+                            <select>
+                                <option>All cars</option>
+                                <option>Economy</option>
+                                <option>Sedan</option>
+                                <option>SUV</option>
+                                <option>Luxury</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button id="quickSearchBtn" class="hero-cta">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                        Explore Cars
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <section class="mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div class="flex flex-wrap gap-2" id="quickFilters">
+                    <button class="chip active" data-filter="all">All</button>
+                    <button class="chip" data-filter="sedan">Sedan</button>
+                    <button class="chip" data-filter="suv">SUV</button>
+                    <button class="chip" data-filter="luxury">Luxury</button>
+                    <button class="chip" data-filter="electric">Electric</button>
+                    <button class="chip" data-filter="hybrid">Hybrid</button>
+                    <button class="chip" data-filter="hatchback">Hatchback</button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="cars-search-shell">
+                        <i data-lucide="search" class="w-4 h-4 text-gray-400"></i>
+                        <input id="carSearchInput" type="text" placeholder="Search by car, brand, or city">
+                    </div>
+                    <select id="sortBy" class="sort-select">
+                        <option value="recommended">Sort: Recommended</option>
+                        <option value="price-low">Price: Low to high</option>
+                        <option value="rating">Best rated</option>
+                    </select>
+                    <button id="toggleFiltersBtn" class="more-filters-btn">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                        More filters
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <section>
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <p class="text-gray-500" id="resultsCount">Showing 8 cars for your trip</p>
+                <button id="clearCompareBtn" class="text-darkRed font-semibold text-sm">Clear compare list</button>
+            </div>
+
+            <div id="carsGrid" class="cars-grid"></div>
+            <div id="pagination" class="pagination-wrap"></div>
+        </section>
+    </main>
+
+    <aside id="filtersDrawer" class="filters-drawer hidden">
+        <div class="filters-card">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold">Advanced Filters</h3>
+                <button id="closeFiltersBtn" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="space-y-5 text-sm">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <p class="font-semibold mb-2">Max price / day</p>
+                        <span id="maxPriceLabel" class="text-gray-500">$330</span>
+                    </div>
+                    <input id="priceRange" type="range" min="40" max="330" value="330" class="w-full accent-red-900">
+                </div>
+                <div>
+                    <p class="font-semibold mb-2">Brand</p>
+                    <select id="brandFilter" class="w-full border border-gray-200 rounded-lg px-3 py-2">
+                        <option value="all">All brands</option>
+                    </select>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between">
+                        <p class="font-semibold mb-2">Model year up to</p>
+                        <span id="modelYearLabel" class="text-gray-500">2025</span>
+                    </div>
+                    <input id="modelYearRange" type="range" min="1990" max="2025" value="2025" class="w-full accent-red-900">
+                </div>
+                <div>
+                    <p class="font-semibold mb-2">Transmission</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label><input id="automaticFilter" type="checkbox" checked> Automatic</label>
+                        <label><input id="manualFilter" type="checkbox"> Manual</label>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2">Fuel</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label><input class="fuel-filter" type="checkbox" value="Petrol"> Petrol</label>
+                        <label><input class="fuel-filter" type="checkbox" value="Hybrid"> Hybrid</label>
+                        <label><input class="fuel-filter" type="checkbox" value="Electric"> Electric</label>
+                        <label><input class="fuel-filter" type="checkbox" value="Diesel"> Diesel</label>
+                    </div>
+                </div>
+            </div>
+            <button id="applyFiltersBtn" class="apply-btn">Apply filters</button>
+        </div>
+    </aside>
+
+    <section id="compareTray" class="compare-tray">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
+            <div>
+                <p class="font-semibold">Compare Cars <span id="compareCount" class="text-darkRed">(0/3)</span></p>
+                <p class="text-sm text-gray-500">Add up to 3 cars for side-by-side decision making.</p>
+            </div>
+            <button id="compareNowBtn" class="compare-btn">Compare now</button>
+        </div>
+    </section>
+
+    <div id="compareModal" class="compare-modal hidden">
+        <div class="compare-modal-backdrop"></div>
+        <div class="compare-modal-card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold">Car Comparison</h3>
+                <button id="closeCompareModalBtn" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200">
+                    <i data-lucide="x" class="w-4 h-4 mx-auto"></i>
+                </button>
+            </div>
+            <div id="compareContent" class="overflow-x-auto"></div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/components.js"></script>
+    <script src="js/cars-data.js"></script>
+    <script src="js/vehicles.js"></script>
+</body>
+</html>
