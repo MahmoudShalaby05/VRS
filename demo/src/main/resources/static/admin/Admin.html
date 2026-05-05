@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoAdmin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        accent: '#800000',
+                        'accent-hover': '#A00000',
+                        'accent-light': '#600000',
+                        dark: {
+                            900: '#0A0A0A',
+                            800: '#111111',
+                            700: '#1A1A1A',
+                            600: '#222222',
+                            500: '#2D2D2D',
+                            400: '#3A3A3A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="../../admin.css">
+</head>
+<body class="bg-dark-900 text-white min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-dark-800 border-r border-dark-500 z-40 transition-transform duration-300 lg:translate-x-0 -translate-x-full flex flex-col">
+        <div class="p-6 border-b border-dark-500">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+                    <i data-lucide="car" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white">AutoAdmin</h1>
+                    <p class="text-xs text-gray-500">Fleet Management</p>
+                </div>
+            </div>
+        </div>
+        <nav class="p-4 space-y-2 flex-1">
+            <button onclick="navigateTo('dashboard')" data-nav="dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                Dashboard
+            </button>
+            <button onclick="navigateTo('vehicles')" data-nav="vehicles" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                <i data-lucide="car" class="w-5 h-5"></i>
+                Vehicles
+            </button>
+            <button onclick="navigateTo('bookings')" data-nav="bookings" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                Bookings
+            </button>
+            <button onclick="navigateTo('damages')" data-nav="damages" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                Damage Reports
+            </button>
+            <button onclick="navigateTo('users')" data-nav="users" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                Users
+            </button>
+        </nav>
+        <!-- Sidebar bottom: Admin info (view only) -->
+        <div class="p-4 border-t border-dark-500">
+            <button onclick="openAdminProfile()" class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-dark-600 transition-colors text-left">
+                <img id="sidebarAdminAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=johncarter&backgroundColor=800000" alt="Admin" class="w-10 h-10 rounded-full object-cover border-2 border-accent flex-shrink-0">
+                <div class="min-w-0">
+                    <p id="sidebarAdminName" class="text-sm font-semibold text-white truncate">John Carter</p>
+                    <p class="text-xs text-gray-500">Super Admin</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 flex-shrink-0 ml-auto"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <header class="sticky top-0 z-20 bg-dark-800/80 backdrop-blur-xl border-b border-dark-500">
+            <div class="flex items-center justify-between px-4 lg:px-8 h-16">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-2 hover:bg-dark-600 rounded-lg transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <div class="relative hidden sm:block">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                        <input id="globalSearch" type="text" placeholder="Search anything..." class="bg-dark-700 border border-dark-500 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent w-64 transition-colors" oninput="handleGlobalSearch(this.value)">
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="relative p-2 hover:bg-dark-600 rounded-lg transition-colors" onclick="toggleNotifications()">
+                        <i data-lucide="bell" class="w-5 h-5 text-gray-400"></i>
+                        <span id="notifBadge" class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                    </button>
+                    <button onclick="openAdminProfile()" class="flex items-center gap-3 p-1.5 hover:bg-dark-600 rounded-lg transition-colors">
+                        <img id="topbarAdminAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=johncarter&backgroundColor=800000" alt="Admin" class="w-8 h-8 rounded-full object-cover border-2 border-accent">
+                        <div class="hidden md:block text-left">
+                            <p id="topbarAdminName" class="text-sm font-medium text-white">John Carter</p>
+                            <p class="text-xs text-gray-500">Super Admin</p>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500 hidden md:block"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Panel -->
+        <div id="notifPanel" class="fixed top-16 right-4 w-80 bg-dark-700 border border-dark-500 rounded-xl shadow-2xl z-50 hidden overflow-hidden">
+            <div class="p-4 border-b border-dark-500 flex items-center justify-between">
+                <h3 class="font-semibold text-white">Notifications</h3>
+                <button onclick="clearNotifications()" class="text-xs text-accent hover:text-accent-hover">Clear all</button>
+            </div>
+            <div id="notifList" class="max-h-80 overflow-y-auto">
+                <div class="p-4 border-b border-dark-500 hover:bg-dark-600 transition-colors">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-white">New booking #B001 confirmed</p>
+                            <p class="text-xs text-gray-500 mt-1">2 minutes ago</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-b border-dark-500 hover:bg-dark-600 transition-colors">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-white">Damage report submitted for VH-003</p>
+                            <p class="text-xs text-gray-500 mt-1">15 minutes ago</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 hover:bg-dark-600 transition-colors">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="car" class="w-4 h-4 text-accent"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-white">Vehicle VH-005 maintenance due</p>
+                            <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <main class="p-4 lg:p-8">
+            <!-- Dashboard Page -->
+            <section id="page-dashboard" class="page-section">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-white">Dashboard Overview</h2>
+                    <p class="text-gray-500 mt-1">Welcome back, John! Here's your fleet summary.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-5 hover:border-accent/50 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center group-hover:bg-accent/30 transition-colors">
+                                <i data-lucide="car" class="w-5 h-5 text-accent"></i>
+                            </div>
+                            <span class="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">+12%</span>
+                        </div>
+                        <p id="stat-vehicles" class="text-2xl font-bold text-white">0</p>
+                        <p class="text-sm text-gray-500 mt-1">Total Vehicles</p>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-5 hover:border-accent/50 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                                <i data-lucide="calendar-check" class="w-5 h-5 text-green-400"></i>
+                            </div>
+                            <span class="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">+8%</span>
+                        </div>
+                        <p id="stat-bookings" class="text-2xl font-bold text-white">0</p>
+                        <p class="text-sm text-gray-500 mt-1">Active Bookings</p>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-5 hover:border-accent/50 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400"></i>
+                            </div>
+                            <span class="text-xs text-red-400 bg-red-400/10 px-2 py-1 rounded-full">+3</span>
+                        </div>
+                        <p id="stat-damages" class="text-2xl font-bold text-white">0</p>
+                        <p class="text-sm text-gray-500 mt-1">Damage Reports</p>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-5 hover:border-accent/50 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center group-hover:bg-yellow-500/30 transition-colors">
+                                <i data-lucide="dollar-sign" class="w-5 h-5 text-yellow-400"></i>
+                            </div>
+                            <span class="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">+24%</span>
+                        </div>
+                        <p id="stat-revenue" class="text-2xl font-bold text-white">$0</p>
+                        <p class="text-sm text-gray-500 mt-1">Total Revenue</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="xl:col-span-2 bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
+                        <div class="p-5 border-b border-dark-500 flex items-center justify-between">
+                            <h3 class="font-semibold text-white">Recent Bookings</h3>
+                            <button onclick="navigateTo('bookings')" class="text-sm text-accent hover:text-accent-hover transition-colors">View all</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-dark-500">
+                                        <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                        <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                                        <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashRecentBookings"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
+                        <div class="p-5 border-b border-dark-500">
+                            <h3 class="font-semibold text-white">Vehicle Status</h3>
+                        </div>
+                        <div class="p-5 space-y-4" id="dashVehicleStatus"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vehicles Page -->
+            <section id="page-vehicles" class="page-section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Manage Vehicles</h2>
+                        <p class="text-gray-500 mt-1">Add, edit, and manage your fleet vehicles.</p>
+                    </div>
+                    <button onclick="openVehicleModal()" class="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add Vehicle
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <select id="filterVehicleStatus" onchange="renderVehicles()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Status</option>
+                        <option value="Available">Available</option>
+                        <option value="Booked">Booked</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                    <select id="filterVehicleType" onchange="renderVehicles()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Types</option>
+                        <option value="Sedan">Sedan</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Truck">Truck</option>
+                        <option value="Van">Van</option>
+                        <option value="Luxury">Luxury</option>
+                    </select>
+                </div>
+                <div id="vehiclesGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+            </section>
+
+            <!-- Bookings Page -->
+            <section id="page-bookings" class="page-section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Manage Bookings</h2>
+                        <p class="text-gray-500 mt-1">Track and manage all vehicle reservations.</p>
+                    </div>
+                    <button onclick="openBookingModal()" class="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        New Booking
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <select id="filterBookingStatus" onchange="renderBookings()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-dark-500">
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Booking ID</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Dates</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Damage Reports Page -->
+            <section id="page-damages" class="page-section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Damage Reports</h2>
+                        <p class="text-gray-500 mt-1">Track and manage vehicle damage incidents.</p>
+                    </div>
+                    <button onclick="openDamageModal()" class="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        New Report
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <select id="filterDamageSeverity" onchange="renderDamages()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Severity</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <select id="filterDamageStatus" onchange="renderDamages()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Status</option>
+                        <option value="Reported">Reported</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Repairing">Repairing</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-dark-500">
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Report ID</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Description</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Severity</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="damagesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Page -->
+            <section id="page-users" class="page-section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Manage Users</h2>
+                        <p class="text-gray-500 mt-1">Add, edit, and manage system users and their roles.</p>
+                    </div>
+                    <button onclick="openUserModal()" class="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        Add User
+                    </button>
+                </div>
+                <!-- User Stats -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <i data-lucide="users" class="w-5 h-5 text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p id="stat-total-users" class="text-xl font-bold text-white">0</p>
+                            <p class="text-xs text-gray-500">Total Users</p>
+                        </div>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i data-lucide="user-check" class="w-5 h-5 text-green-400"></i>
+                        </div>
+                        <div>
+                            <p id="stat-active-users" class="text-xl font-bold text-white">0</p>
+                            <p class="text-xs text-gray-500">Active Users</p>
+                        </div>
+                    </div>
+                    <div class="bg-dark-700 border border-dark-500 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center">
+                            <i data-lucide="shield" class="w-5 h-5 text-accent"></i>
+                        </div>
+                        <div>
+                            <p id="stat-admin-users" class="text-xl font-bold text-white">0</p>
+                            <p class="text-xs text-gray-500">Admins</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <select id="filterUserRole" onchange="renderUsers()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Roles</option>
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Staff">Staff</option>
+                    </select>
+                    <select id="filterUserStatus" onchange="renderUsers()" class="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent">
+                        <option value="all">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+                <!-- Users Table -->
+                <div class="bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-dark-500">
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">User</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Role</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Email</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Phone</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Joined</th>
+                                    <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Admin Profile Modal (view only) -->
+    <div id="adminProfileModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAdminProfile()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-md overflow-hidden animate-modal-in">
+            <div class="h-24 bg-gradient-to-r from-accent to-accent-hover"></div>
+            <button onclick="closeAdminProfile()" class="absolute top-4 right-4 p-1.5 bg-black/30 hover:bg-black/50 rounded-lg transition-colors">
+                <i data-lucide="x" class="w-4 h-4 text-white"></i>
+            </button>
+            <div class="px-6 pb-6">
+                <div class="flex justify-center -mt-12 mb-4">
+                    <img id="adminProfileAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=johncarter&backgroundColor=800000" alt="Admin" class="w-24 h-24 rounded-full border-4 border-dark-700 object-cover bg-dark-600">
+                </div>
+                <div class="text-center mb-6">
+                    <h3 id="adminProfileName" class="text-xl font-bold text-white">John Carter</h3>
+                    <p id="adminProfileRole" class="text-accent text-sm">Super Administrator</p>
+                </div>
+                <div class="space-y-3 mb-6">
+                    <div class="flex items-center gap-3 p-3 bg-dark-600 rounded-lg">
+                        <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i>
+                        <span id="adminProfileEmail" class="text-sm text-gray-300">john.carter@autoadmin.com</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-dark-600 rounded-lg">
+                        <i data-lucide="phone" class="w-4 h-4 text-gray-400"></i>
+                        <span id="adminProfilePhone" class="text-sm text-gray-300">+1 (555) 234-5678</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-dark-600 rounded-lg">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-gray-400"></i>
+                        <span id="adminProfileLocation" class="text-sm text-gray-300">New York, NY 10001</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-dark-600 rounded-lg">
+                        <i data-lucide="calendar" class="w-4 h-4 text-gray-400"></i>
+                        <span id="adminProfileJoined" class="text-sm text-gray-300">Joined: March 15, 2022</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-dark-600 rounded-lg">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-gray-400"></i>
+                        <span class="text-sm text-gray-300">Role: Full Access</span>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Modal -->
+    <div id="vehicleModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeVehicleModal()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-lg p-6 animate-modal-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="vehicleModalTitle" class="text-lg font-bold text-white">Add Vehicle</h3>
+                <button onclick="closeVehicleModal()" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-gray-400"></i>
+                </button>
+            </div>
+            <form id="vehicleForm" onsubmit="saveVehicle(event)" class="space-y-4">
+                <input type="hidden" id="vehicleEditId" value="">
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Vehicle Photo</label>
+                    <div id="vehiclePhotoPreview" class="w-full h-40 bg-dark-600 border-2 border-dashed border-dark-400 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors relative overflow-hidden" onclick="document.getElementById('vehiclePhotoInput').click()">
+                        <i data-lucide="camera" class="w-8 h-8 text-gray-500" id="vehiclePhotoIcon"></i>
+                        <p class="text-sm text-gray-500" id="vehiclePhotoText">Click to add photo</p>
+                        <p class="text-xs text-gray-600">JPG, PNG up to 5MB</p>
+                        <img id="vehiclePhotoImg" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
+                        <div id="vehiclePhotoOverlay" class="absolute inset-0 bg-black/40 hidden flex items-center justify-center">
+                            <span class="text-xs text-white bg-black/60 px-2 py-1 rounded">Click to change</span>
+                        </div>
+                    </div>
+                    <input type="file" id="vehiclePhotoInput" accept="image/*" class="hidden" onchange="previewVehiclePhoto(event)">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Make</label>
+                        <input type="text" id="vehicleMake" required placeholder="Toyota" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Model</label>
+                        <input type="text" id="vehicleModel" required placeholder="Camry" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Year</label>
+                        <input type="number" id="vehicleYear" required placeholder="2024" min="2000" max="2030" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Type</label>
+                        <select id="vehicleType" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="">Select type</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Truck">Truck</option>
+                            <option value="Van">Van</option>
+                            <option value="Luxury">Luxury</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">License Plate</label>
+                        <input type="text" id="vehiclePlate" required placeholder="ABC-1234" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Daily Rate ($)</label>
+                        <input type="number" id="vehicleRate" required placeholder="75" min="1" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Status</label>
+                    <select id="vehicleStatus" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                        <option value="Available">Available</option>
+                        <option value="Booked">Booked</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Save Vehicle</button>
+                    <button type="button" onclick="closeVehicleModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBookingModal()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-lg p-6 animate-modal-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="bookingModalTitle" class="text-lg font-bold text-white">New Booking</h3>
+                <button onclick="closeBookingModal()" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-gray-400"></i>
+                </button>
+            </div>
+            <form id="bookingForm" onsubmit="saveBooking(event)" class="space-y-4">
+                <input type="hidden" id="bookingEditId" value="">
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Customer Name</label>
+                    <input type="text" id="bookingCustomer" required placeholder="Jane Smith" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Vehicle</label>
+                    <select id="bookingVehicle" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                        <option value="">Select a vehicle</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Start Date</label>
+                        <input type="date" id="bookingStart" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">End Date</label>
+                        <input type="date" id="bookingEnd" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Status</label>
+                        <select id="bookingStatus" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Total Amount ($)</label>
+                        <input type="number" id="bookingAmount" required placeholder="350" min="1" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Save Booking</button>
+                    <button type="button" onclick="closeBookingModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Damage Report Modal -->
+    <div id="damageModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDamageModal()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-lg p-6 animate-modal-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="damageModalTitle" class="text-lg font-bold text-white">New Damage Report</h3>
+                <button onclick="closeDamageModal()" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-gray-400"></i>
+                </button>
+            </div>
+            <form id="damageForm" onsubmit="saveDamage(event)" class="space-y-4">
+                <input type="hidden" id="damageEditId" value="">
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Damage Photo</label>
+                    <div id="damagePhotoPreview" class="w-full h-40 bg-dark-600 border-2 border-dashed border-dark-400 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors relative overflow-hidden" onclick="document.getElementById('damagePhotoInput').click()">
+                        <i data-lucide="camera" class="w-8 h-8 text-gray-500" id="damagePhotoIcon"></i>
+                        <p class="text-sm text-gray-500" id="damagePhotoText">Click to add photo</p>
+                        <p class="text-xs text-gray-600">JPG, PNG up to 5MB</p>
+                        <img id="damagePhotoImg" src="" alt="" class="absolute inset-0 w-full h-full object-cover hidden">
+                        <div id="damagePhotoOverlay" class="absolute inset-0 bg-black/40 hidden flex items-center justify-center">
+                            <span class="text-xs text-white bg-black/60 px-2 py-1 rounded">Click to change</span>
+                        </div>
+                    </div>
+                    <input type="file" id="damagePhotoInput" accept="image/*" class="hidden" onchange="previewDamagePhoto(event)">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Vehicle</label>
+                    <select id="damageVehicle" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                        <option value="">Select a vehicle</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Description</label>
+                    <textarea id="damageDescription" required rows="3" placeholder="Describe the damage..." class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Severity</label>
+                        <select id="damageSeverity" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Status</label>
+                        <select id="damageStatus" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Reported">Reported</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Repairing">Repairing</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Estimated Repair Cost ($)</label>
+                    <input type="number" id="damageCost" placeholder="500" min="0" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Save Report</button>
+                    <button type="button" onclick="closeDamageModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeUserModal()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-lg p-6 animate-modal-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="userModalTitle" class="text-lg font-bold text-white">Add User</h3>
+                <button onclick="closeUserModal()" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-gray-400"></i>
+                </button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)" class="space-y-4">
+                <input type="hidden" id="userEditId" value="">
+
+                <!-- Avatar Upload -->
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <img id="userAvatarPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=new&backgroundColor=2D2D2D" alt="" class="w-16 h-16 rounded-full object-cover border-2 border-dark-400 bg-dark-600">
+                        <button type="button" onclick="document.getElementById('userAvatarInput').click()" class="absolute -bottom-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center hover:bg-accent-hover transition-colors">
+                            <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+                        </button>
+                        <input type="file" id="userAvatarInput" accept="image/*" class="hidden" onchange="previewUserAvatar(event)">
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-white font-medium">Profile Photo</p>
+                        <p class="text-xs text-gray-500">Click the camera icon to upload</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">First Name</label>
+                        <input type="text" id="userFirstName" required placeholder="Jane" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Last Name</label>
+                        <input type="text" id="userLastName" required placeholder="Smith" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Email</label>
+                    <input type="email" id="userEmail" required placeholder="jane.smith@autoadmin.com" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Phone</label>
+                    <input type="text" id="userPhone" placeholder="+1 (555) 000-0000" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Role</label>
+                        <select id="userRole" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Staff">Staff</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Super Admin">Super Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Status</label>
+                        <select id="userStatus" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-accent hover:bg-accent-hover text-white py-2.5 rounded-lg text-sm font-medium transition-colors">Save User</button>
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+        <div class="relative bg-dark-700 border border-dark-500 rounded-2xl w-full max-w-sm p-6 animate-modal-in">
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="trash-2" class="w-6 h-6 text-red-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Confirm Delete</h3>
+                <p id="deleteMessage" class="text-sm text-gray-400 mt-2">Are you sure you want to delete this item? This action cannot be undone.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 bg-dark-500 hover:bg-dark-400 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                <button id="confirmDeleteBtn" onclick="confirmDelete()" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[70] space-y-3"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../../admin.js"></script>
+</body>
+</html>
