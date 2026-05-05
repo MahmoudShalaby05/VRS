@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed | Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body class="font-inter bg-[#090505] text-white min-h-screen">
+    <div id="navbar-container"></div>
+
+    <main class="relative pt-28 pb-16">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_35%)] pointer-events-none"></div>
+        <div class="absolute top-24 right-10 w-72 h-72 bg-darkRed/20 rounded-full blur-3xl"></div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                <a href="index.html" class="text-sm text-gray-300 hover:text-white transition-colors">← Back to homepage</a>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <p class="text-sm uppercase tracking-[0.35em] text-red-200 font-semibold">Secure Access</p>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">Sign in to your DriveRed account</h1>
+                    <p class="text-gray-300 text-lg max-w-xl">Access your dashboard, manage bookings, and continue your premium vehicle rental experience with a secure login.</p>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="bg-white/5 border border-white/10 rounded-3xl p-6">
+                            <p class="text-red-200 font-semibold text-sm uppercase tracking-wide mb-2">Fast booking</p>
+                            <p class="text-gray-400 text-sm">Save your favorite vehicles and complete reservations in seconds.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-3xl p-6">
+                            <p class="text-red-200 font-semibold text-sm uppercase tracking-wide mb-2">24/7 support</p>
+                            <p class="text-gray-400 text-sm">Get help anytime from our support team before, during, or after your trip.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="auth-card relative bg-white/5 border border-white/10 rounded-[32px] shadow-2xl shadow-black/25 p-8 backdrop-blur-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.35em] text-red-200">Welcome Back</p>
+                            <h2 class="text-3xl font-bold mt-3">Sign in</h2>
+                        </div>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-darkRed/10 text-red-200 text-sm">
+                            <span class="w-2 h-2 rounded-full bg-darkRed animate-pulse"></span>
+                            secure login
+                        </div>
+                    </div>
+
+                    <form id="loginForm" class="space-y-5" novalidate>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="loginEmail">Email address</label>
+                            <input id="loginEmail" name="email" type="email" placeholder="name@example.com" class="form-input w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="loginPassword">Password</label>
+                            <div class="relative">
+                                <input id="loginPassword" name="password" type="password" placeholder="Enter your password" class="form-input w-full pr-12" required minlength="8">
+                                <button type="button" id="toggleLoginPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-white">Show</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-300">
+                            <label class="inline-flex items-center gap-2">
+                                <input id="rememberMe" type="checkbox" class="h-4 w-4 text-darkRed rounded border-gray-600 bg-white/5 focus:ring-darkRed">
+                                Remember me
+                            </label>
+                            <a href="#" class="text-red-200 hover:text-white transition-colors">Need help?</a>
+                        </div>
+
+                        <button type="submit" class="form-button w-full">Sign In</button>
+                        <p class="text-center text-sm text-gray-400">New to DriveRed? <a href="register.html" class="text-white font-semibold hover:text-red-300">Create an account</a></p>
+                        <p class="text-center text-xs text-gray-500">Admin access: press <span class="text-white font-semibold">Ctrl + Shift + 5</span> to unlock admin login.</p>
+                        <div id="loginStatus" class="text-sm rounded-2xl px-4 py-3 hidden"></div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

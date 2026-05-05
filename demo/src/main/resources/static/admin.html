@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed | Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body class="font-inter bg-[#090505] text-white min-h-screen">
+    <div id="navbar-container"></div>
+
+    <main class="relative pt-28 pb-16">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.06),_transparent_30%)] pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3 text-sm text-gray-300">
+                    <a href="index.html" class="hover:text-white transition-colors">← Back to homepage</a>
+                    <span class="text-gray-500">|</span>
+                    <a href="login.html" class="hover:text-white transition-colors">Back to user login</a>
+                </div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-[32px] shadow-2xl shadow-black/25 p-10 backdrop-blur-xl">
+                <div class="mb-8">
+                    <p class="text-sm uppercase tracking-[0.35em] text-red-200">Administrator Access</p>
+                    <h1 class="text-4xl font-black mt-3">Admin Panel Login</h1>
+                    <p class="text-gray-300 mt-3 max-w-2xl">Enter your admin credentials to continue to the DriveRed admin dashboard.</p>
+                </div>
+
+                <form id="adminForm" class="space-y-5" novalidate>
+                    <div>
+                        <label class="block text-gray-300 text-sm font-medium mb-2" for="adminEmail">Admin email</label>
+                        <input id="adminEmail" name="email" type="email" placeholder="admin@drivered.com" class="form-input w-full" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-300 text-sm font-medium mb-2" for="adminPassword">Password</label>
+                        <div class="relative">
+                            <input id="adminPassword" name="password" type="password" placeholder="Enter admin password" class="form-input w-full pr-12" required minlength="8">
+                            <button type="button" id="toggleAdminPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-white">Show</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="form-button w-full">Login as Admin</button>
+                    <p class="text-center text-xs text-gray-500">Admin shortcut: <span class="text-white font-semibold">Ctrl + Shift + 5</span> (Use from the login screen.)</p>
+                    <div id="adminStatus" class="text-sm rounded-2xl px-4 py-3 hidden"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

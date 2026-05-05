@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed FAQ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/faq.css">
+</head>
+<body class="bg-[#090505] text-white">
+    <div id="navbar-container"></div>
+
+    <main class="faq-page min-h-screen">
+        <section class="faq-hero relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-[#090505] via-[#120709] to-[#090505]"></div>
+            <div class="absolute top-12 right-12 w-72 h-72 bg-darkRed/20 rounded-full blur-3xl animate-pulse-slow"></div>
+            <div class="absolute bottom-16 left-10 w-80 h-80 bg-red-900/20 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
+
+            <div class="relative max-w-6xl mx-auto px-6 py-24 lg:py-32">
+                <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-12 items-center">
+                    <div class="space-y-8">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-darkRed"></i>
+                            Frequently Asked Questions
+                        </span>
+                        <h1 class="text-5xl md:text-6xl font-black leading-tight">
+                            Answers for everything you need to know about <span class="text-darkRed">DriveRed</span>
+                        </h1>
+                        <p class="max-w-2xl text-gray-300 text-lg leading-relaxed">
+                            Clear and concise support for rentals, accounts, payment, and admin access. If you need anything else, contact our support team and we’ll respond quickly.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 text-sm text-white/80">
+                            <a href="index.html" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 transition hover:border-darkRed hover:bg-darkRed/10">
+                                <i data-lucide="arrow-left" class="w-4 h-4 text-darkRed"></i>
+                                Back to homepage
+                            </a>
+                            <a href="login.html" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-darkRed text-white px-5 py-3 transition hover:bg-red-800">
+                                <i data-lucide="log-in" class="w-4 h-4"></i>
+                                Login / Register
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="faq-hero-card bg-white/5 border border-white/10 p-8 rounded-[2rem] shadow-2xl shadow-black/30 backdrop-blur-md">
+                        <p class="text-sm uppercase tracking-[0.3em] text-red-200 mb-4">Need help fast?</p>
+                        <h2 class="text-3xl font-semibold text-white mb-6">Common questions answered</h2>
+                        <div class="space-y-5 text-gray-300">
+                            <div class="rounded-3xl bg-[#0f0708] p-5 border border-white/10">
+                                <h3 class="font-semibold text-white">How do I create an account?</h3>
+                                <p class="mt-3 text-sm leading-6 text-gray-400">Start by clicking Login / Register, then provide your full name, email, Egyptian phone number starting with 01, and a strong password that meets our security requirements.</p>
+                            </div>
+                            <div class="rounded-3xl bg-[#0f0708] p-5 border border-white/10">
+                                <h3 class="font-semibold text-white">What documents do I need to rent a car?</h3>
+                                <p class="mt-3 text-sm leading-6 text-gray-400">You need a valid driving license and national ID. Make sure the information on your account matches your documents before pickup.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-7xl mx-auto px-6 py-24">
+            <div class="grid lg:grid-cols-[0.9fr_0.7fr] gap-12">
+                <div>
+                    <div class="mb-10">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-red-200 uppercase tracking-[0.25em]">Helpful answers</span>
+                        <h2 class="mt-4 text-4xl font-bold text-white">Everything you need before you rent</h2>
+                        <p class="mt-4 text-gray-400 leading-7 max-w-2xl">Explore our most popular questions, covering account setup, security, bookings, and the admin panel.</p>
+                    </div>
+
+                    <div class="faq-grid space-y-4">
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Account</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">What information do I need to register?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                Register with your full name, email address, Egyptian phone number starting with 01, and a secure password that includes uppercase, lowercase, numbers, and a symbol.
+                            </div>
+                        </article>
+
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Documentation</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">What documents do I need to rent a car?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                You need a valid national ID and a current driving license. Make sure your account details match the information on your documents before pickup.
+                            </div>
+                        </article>
+
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Payment</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">How can I pay for my rental?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                Payment is completed during checkout. We accept online card payments and other secure payment options depending on the booking flow available at the time.
+                            </div>
+                        </article>
+
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Support</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">What if I forget my password?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                If you forget your password, use the login page and follow the password recovery instructions or contact support at support@drivered.com for assistance.
+                            </div>
+                        </article>
+
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Support</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">What if I hit another car or have an accident?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                In case of an accident, stop safely and contact support immediately. Follow local safety procedures, exchange information with the other driver, and let our team guide you through the next steps.
+                            </div>
+                        </article>
+
+                        <article class="faq-item rounded-[1.75rem] border border-white/10 bg-white/5">
+                            <button class="faq-question group flex w-full items-center justify-between gap-4 p-6 text-left">
+                                <span>
+                                    <span class="text-sm text-red-200 uppercase tracking-[0.25em]">Support</span>
+                                    <p class="mt-3 text-xl font-semibold text-white">What if I need help during my rental?</p>
+                                </span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-white/70 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-answer px-6 pb-6 text-gray-300">
+                                If you need assistance during your rental, contact support immediately via email or live chat. Our team is ready to help with bookings, roadside issues, or payment questions.
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <aside class="faq-sidebar rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-black/20">
+                    <div class="rounded-[2rem] bg-[#0f0708] border border-white/10 p-6">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-darkRed/10 px-4 py-2 text-sm text-red-200 uppercase tracking-[0.25em]">Need help fast?</span>
+                        <h3 class="mt-5 text-3xl font-semibold text-white">Support available now</h3>
+                        <p class="mt-4 text-gray-300 leading-7">Get immediate help with your booking, accident support, document checks, or roadside assistance. Our support team is ready to guide you 24/7.</p>
+                        <div class="mt-5 grid gap-3">
+                            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+                                <p class="text-sm text-gray-400">Email support</p>
+                                <p class="mt-2 font-semibold text-white">support@drivered.com</p>
+                            </div>
+                            <div class="rounded-2xl border border-darkRed bg-darkRed/10 px-4 py-4 text-sm text-red-200">
+                                <p class="font-semibold">Support available 24/7</p>
+                                <p class="mt-1 text-gray-300">Ask about bookings, accidents, or roadside assistance.</p>
+                            </div>
+                        </div>
+                        <ul class="mt-5 space-y-3 text-gray-300 text-sm">
+                            <li class="flex gap-3 items-start">
+                                <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-darkRed"></span>
+                                <span>Booking changes and cancellations</span>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-darkRed"></span>
+                                <span>Accident and damage reporting</span>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <span class="mt-1 inline-flex h-2.5 w-2.5 rounded-full bg-darkRed"></span>
+                                <span>Payment or support questions</span>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script src="js/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.faq-item');
+            items.forEach(item => {
+                const button = item.querySelector('.faq-question');
+                button.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    items.forEach(el => el.classList.remove('active'));
+                    if (!isActive) item.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

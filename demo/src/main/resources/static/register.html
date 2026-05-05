@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveRed | Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body class="font-inter bg-[#090505] text-white min-h-screen">
+    <div id="navbar-container"></div>
+
+    <main class="relative pt-28 pb-16">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.06),_transparent_30%)] pointer-events-none"></div>
+        <div class="absolute top-24 left-10 w-72 h-72 bg-darkRed/20 rounded-full blur-3xl"></div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+                <a href="index.html" class="text-sm text-gray-300 hover:text-white transition-colors">← Back to homepage</a>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <section class="auth-card relative bg-white/5 border border-white/10 rounded-[32px] shadow-2xl shadow-black/25 p-8 backdrop-blur-xl">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.35em] text-red-200">Create account</p>
+                            <h2 class="text-3xl font-bold mt-3">Register</h2>
+                        </div>
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-darkRed/10 text-red-200 text-sm">
+                            <span class="w-2 h-2 rounded-full bg-darkRed animate-pulse"></span>
+                            secure signup
+                        </div>
+                    </div>
+
+                    <form id="registerForm" class="space-y-5" novalidate>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="registerName">Full name</label>
+                            <input id="registerName" name="name" type="text" placeholder="Jane Doe" class="form-input w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="registerEmail">Email address</label>
+                            <input id="registerEmail" name="email" type="email" placeholder="name@example.com" class="form-input w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="registerPhone">Phone number</label>
+                            <input id="registerPhone" name="phone" type="tel" placeholder="01012345678" class="form-input w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="registerPassword">Password</label>
+                            <div class="relative">
+                                <input id="registerPassword" name="password" type="password" placeholder="Create a strong password" class="form-input w-full pr-12" required>
+                                <button type="button" id="toggleRegisterPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 hover:text-white">Show</button>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Must include: uppercase, lowercase, number, symbol, 8+ characters</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2" for="registerConfirm">Confirm password</label>
+                            <input id="registerConfirm" name="confirmPassword" type="password" placeholder="Repeat your password" class="form-input w-full" required>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-300">
+                            <input id="acceptTerms" type="checkbox" class="h-4 w-4 text-darkRed rounded border-gray-600 bg-white/5 focus:ring-darkRed" required>
+                            <label for="acceptTerms">I agree to the <a href="#" class="text-red-200 hover:text-white">terms and privacy policy</a>.</label>
+                        </div>
+
+                        <button type="submit" class="form-button w-full">Create Account</button>
+                        <p class="text-center text-sm text-gray-400">Already have an account? <a href="login.html" class="text-white font-semibold hover:text-red-300">Sign in</a></p>
+                        <div id="registerStatus" class="text-sm rounded-2xl px-4 py-3 hidden"></div>
+                    </form>
+                </section>
+
+                <div class="space-y-6">
+                    <p class="text-sm uppercase tracking-[0.35em] text-red-200 font-semibold">DriveRed Membership</p>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">Join the premium fleet today.</h1>
+                    <p class="text-gray-300 text-lg max-w-xl">Register once and access premium vehicle rentals, fast checkout, and personalized service across every city.</p>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="bg-white/5 border border-white/10 rounded-3xl p-6">
+                            <p class="text-red-200 font-semibold text-sm uppercase tracking-wide mb-2">Instant booking</p>
+                            <p class="text-gray-400 text-sm">Save your payment and rental preferences for faster reservations.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-3xl p-6">
+                            <p class="text-red-200 font-semibold text-sm uppercase tracking-wide mb-2">Flexible rental</p>
+                            <p class="text-gray-400 text-sm">Book by the hour, day, or week with no hidden fees.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
