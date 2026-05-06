@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Damage Report | DriveLease</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="damageReports.css" />
+  <script src="damageReports.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-6 right-6 z-50 flex flex-col gap-3"></div>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-maroon-700 rounded-lg flex items-center justify-center">
+            <i data-lucide="car" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold text-gray-900">Drive<span class="text-maroon-700">Lease</span></span>
+        </div>
+
+        <!-- Nav -->
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="#" class="text-sm text-gray-500 hover:text-maroon-700 transition-colors">Dashboard</a>
+          <a href="#" class="text-sm text-gray-500 hover:text-maroon-700 transition-colors">My Rentals</a>
+          <a href="#" class="text-sm font-semibold text-maroon-700 border-b-2 border-maroon-700 pb-0.5">Damage Report</a>
+          <a href="#" class="text-sm text-gray-500 hover:text-maroon-700 transition-colors">Support</a>
+        </nav>
+
+        <!-- Profile -->
+        <div class="flex items-center gap-3">
+          <button class="relative p-2 text-gray-400 hover:text-maroon-700 transition-colors">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-maroon-600 rounded-full"></span>
+          </button>
+          <div class="w-8 h-8 rounded-full bg-maroon-100 flex items-center justify-center">
+            <span class="text-xs font-semibold text-maroon-700">JD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-2">
+        <a href="#" class="text-sm text-gray-400 hover:text-maroon-700 transition-colors flex items-center gap-1">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i> Back to Rental
+        </a>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <div class="w-10 h-10 bg-maroon-100 rounded-xl flex items-center justify-center">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-maroon-700"></i>
+            </div>
+            Report Vehicle Damage
+          </h1>
+          <p class="mt-1 text-gray-500 text-sm">Submit a detailed damage report for your rented vehicle. All fields marked with <span class="text-maroon-600">*</span> are required.</p>
+        </div>
+        <div class="flex items-center gap-2 bg-maroon-50 border border-maroon-200 rounded-lg px-3 py-2 self-start">
+          <i data-lucide="clock" class="w-4 h-4 text-maroon-600"></i>
+          <span class="text-xs font-medium text-maroon-700">Rental ID: <span class="font-bold">#RTL-2024-0892</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Stepper -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <!-- Step 1 -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="goToStep(1)">
+          <div id="stepCircle1" class="w-9 h-9 rounded-full bg-maroon-700 text-white flex items-center justify-center text-sm font-bold transition-all duration-300">1</div>
+          <div class="hidden sm:block">
+            <p id="stepLabel1" class="text-sm font-semibold text-maroon-700 transition-colors">Vehicle Info</p>
+            <p class="text-xs text-gray-400">Identify the vehicle</p>
+          </div>
+        </div>
+
+        <div id="stepLine1" class="flex-1 h-0.5 bg-gray-200 mx-4 transition-colors duration-300"></div>
+
+        <!-- Step 2 -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="goToStep(2)">
+          <div id="stepCircle2" class="w-9 h-9 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-sm font-bold transition-all duration-300">2</div>
+          <div class="hidden sm:block">
+            <p id="stepLabel2" class="text-sm font-medium text-gray-400 transition-colors">Damage Details</p>
+            <p class="text-xs text-gray-400">Describe the damage</p>
+          </div>
+        </div>
+
+        <div id="stepLine2" class="flex-1 h-0.5 bg-gray-200 mx-4 transition-colors duration-300"></div>
+
+        <!-- Step 3 -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="goToStep(3)">
+          <div id="stepCircle3" class="w-9 h-9 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-sm font-bold transition-all duration-300">3</div>
+          <div class="hidden sm:block">
+            <p id="stepLabel3" class="text-sm font-medium text-gray-400 transition-colors">Photos & Review</p>
+            <p class="text-xs text-gray-400">Upload evidence</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-full bg-gray-100 rounded-full h-1.5">
+        <div id="progressBar" class="progress-bar-fill bg-gradient-to-r from-maroon-600 to-maroon-800 h-1.5 rounded-full"></div>
+      </div>
+    </div>
+
+    <!-- Form Container -->
+    <form id="damageReportForm" onsubmit="handleSubmit(event)">
+
+      <!-- ==================== STEP 1: Vehicle Information ==================== -->
+      <div id="step1" class="step-section active">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <!-- Section Header -->
+          <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <i data-lucide="car" class="w-4 h-4 text-white"></i>
+              </div>
+              <div>
+                <h2 class="text-white font-semibold">Vehicle Information</h2>
+                <p class="text-maroon-200 text-xs">Confirm the vehicle involved in the incident</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-6 space-y-6">
+            <!-- Vehicle Preview Card -->
+            <div class="flex flex-col sm:flex-row gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <img src="http://static.photos/automotive/640x360/77" alt="Vehicle" class="w-full sm:w-48 h-32 object-cover rounded-lg" />
+              <div class="flex-1 space-y-2">
+                <h3 class="font-bold text-gray-900">Toyota Camry 2023</h3>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                  <div class="flex items-center gap-2 text-gray-500">
+                    <i data-lucide="hash" class="w-3.5 h-3.5"></i>
+                    <span>License:</span>
+                    <span class="font-semibold text-gray-700">ABC-1234</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-gray-500">
+                    <i data-lucide="palette" class="w-3.5 h-3.5"></i>
+                    <span>Color:</span>
+                    <span class="font-semibold text-gray-700">Silver</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-gray-500">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    <span>Year:</span>
+                    <span class="font-semibold text-gray-700">2023</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-gray-500">
+                    <i data-lucide="gauge" class="w-3.5 h-3.5"></i>
+                    <span>Mileage:</span>
+                    <span class="font-semibold text-gray-700">34,200 km</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 pt-1">
+                  <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Active Rental</span>
+                  <span class="text-xs text-gray-400">Pickup: Jan 15 → Return: Jan 22</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">License Plate <span class="text-maroon-600">*</span></label>
+                <input type="text" value="ABC-1234" readonly class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Vehicle Model <span class="text-maroon-600">*</span></label>
+                <input type="text" value="Toyota Camry 2023" readonly class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Rental ID <span class="text-maroon-600">*</span></label>
+                <input type="text" value="RTL-2024-0892" readonly class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 cursor-not-allowed" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Current Mileage (km) <span class="text-maroon-600">*</span></label>
+                <div class="relative">
+                  <input type="number" id="currentMileage" placeholder="e.g. 34500" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent transition-all" />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">km</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Note -->
+            <div class="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <i data-lucide="info" class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0"></i>
+              <p class="text-xs text-amber-700">Vehicle details are pre-filled from your active rental. Please update the current mileage if different from the displayed value.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STEP 2: Damage Details ==================== -->
+      <div id="step2" class="step-section">
+        <div class="space-y-6">
+
+          <!-- Damage Basics -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Damage Basics</h2>
+                  <p class="text-maroon-200 text-xs">When and where did the incident occur?</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Date of Incident <span class="text-maroon-600">*</span></label>
+                  <input type="date" id="incidentDate" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent transition-all" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Time of Incident</label>
+                  <input type="time" id="incidentTime" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Location of Incident <span class="text-maroon-600">*</span></label>
+                <div class="relative">
+                  <i data-lucide="map-pin" class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                  <input type="text" id="incidentLocation" placeholder="e.g. Intersection of Main St and 5th Ave, Downtown" class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent transition-all" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Damage Type -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="shapes" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Damage Type</h2>
+                  <p class="text-maroon-200 text-xs">Select all types of damage you observed</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <!-- Damage chips -->
+                <div class="damage-type">
+                  <input type="checkbox" id="dScratch" class="hidden peer" />
+                  <label for="dScratch" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🔧</span> Scratch
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dDent" class="hidden peer" />
+                  <label for="dDent" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🔩</span> Dent
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dCrack" class="hidden peer" />
+                  <label for="dCrack" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">💥</span> Crack
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dShatter" class="hidden peer" />
+                  <label for="dShatter" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🪟</span> Shattered Glass
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dTire" class="hidden peer" />
+                  <label for="dTire" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🛞</span> Tire Damage
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dBumper" class="hidden peer" />
+                  <label for="dBumper" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🚧</span> Bumper Damage
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dPaint" class="hidden peer" />
+                  <label for="dPaint" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🎨</span> Paint Damage
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dMechanical" class="hidden peer" />
+                  <label for="dMechanical" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">⚙️</span> Mechanical
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dWater" class="hidden peer" />
+                  <label for="dWater" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🌊</span> Water Damage
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dInterior" class="hidden peer" />
+                  <label for="dInterior" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">🪑</span> Interior Damage
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dMissing" class="hidden peer" />
+                  <label for="dMissing" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">❓</span> Missing Parts
+                  </label>
+                </div>
+                <div class="damage-type">
+                  <input type="checkbox" id="dOther" class="hidden peer" />
+                  <label for="dOther" class="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-maroon-300 transition-all text-sm text-gray-700">
+                    <span class="text-base">➕</span> Other
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Damage Location on Vehicle -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="crosshair" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Damage Location on Vehicle</h2>
+                  <p class="text-maroon-200 text-xs">Click on the area(s) where the damage is located</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex flex-col md:flex-row gap-6 items-center">
+                <!-- Car Diagram -->
+                <div class="relative w-full max-w-sm">
+                  <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Car body top view -->
+                    <rect x="80" y="30" width="240" height="140" rx="40" fill="#e5e7eb" stroke="#9ca3af" stroke-width="1.5"/>
+                    <!-- Windshield -->
+                    <rect x="120" y="40" width="160" height="50" rx="10" fill="#d1d5db" stroke="#9ca3af" stroke-width="1"/>
+                    <!-- Rear window -->
+                    <rect x="130" y="115" width="140" height="35" rx="8" fill="#d1d5db" stroke="#9ca3af" stroke-width="1"/>
+                    <!-- Center line -->
+                    <line x1="200" y1="30" x2="200" y2="170" stroke="#9ca3af" stroke-width="0.5" stroke-dasharray="4,4"/>
+                    <!-- Wheels -->
+                    <rect x="70" y="25" width="30" height="18" rx="6" fill="#6b7280" stroke="#4b5563" stroke-width="1"/>
+                    <rect x="300" y="25" width="30" height="18" rx="6" fill="#6b7280" stroke="#4b5563" stroke-width="1"/>
+                    <rect x="70" y="157" width="30" height="18" rx="6" fill="#6b7280" stroke="#4b5563" stroke-width="1"/>
+                    <rect x="300" y="157" width="30" height="18" rx="6" fill="#6b7280" stroke="#4b5563" stroke-width="1"/>
+                    <!-- Labels -->
+                    <text x="200" y="22" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="Inter">FRONT</text>
+                    <text x="200" y="192" text-anchor="middle" fill="#9ca3af" font-size="9" font-family="Inter">REAR</text>
+                  </svg>
+
+                  <!-- Location buttons overlaid on the car -->
+                  <button type="button" class="car-point" data-location="front-left" title="Front Left"></button>
+                  <button type="button" class="car-point" data-location="front-center" title="Front Center"></button>
+                  <button type="button" class="car-point" data-location="front-right" title="Front Right"></button>
+                  <button type="button" class="car-point" data-location="middle-left" title="Middle Left"></button>
+                  <button type="button" class="car-point" data-location="middle-right" title="Middle Right"></button>
+                  <button type="button" class="car-point" data-location="rear-left" title="Rear Left"></button>
+                  <button type="button" class="car-point" data-location="rear-center" title="Rear Center"></button>
+                  <button type="button" class="car-point" data-location="rear-right" title="Rear Right"></button>
+                  <button type="button" class="car-point" data-location="roof" title="Roof"></button>
+                  <button type="button" class="car-point" data-location="undercarriage" title="Undercarriage"></button>
+                </div>
+
+                <!-- Selected locations list -->
+                <div class="flex-1 w-full">
+                  <p class="text-sm font-medium text-gray-700 mb-3">Selected Locations:</p>
+                  <div id="selectedLocations" class="flex flex-wrap gap-2 min-h-[40px]">
+                    <span class="text-xs text-gray-400 italic">No locations selected yet</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Severity -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="gauge" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Severity Level</h2>
+                  <p class="text-maroon-200 text-xs">How severe is the damage?</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button type="button" onclick="selectSeverity(this, 'minor')" data-severity="minor" class="severity-option group relative bg-white border-2 border-gray-200 rounded-xl p-5 text-center hover:border-green-400 transition-all focus:outline-none">
+                  <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                    <i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>
+                  </div>
+                  <h3 class="font-semibold text-gray-800 mb-1">Minor</h3>
+                  <p class="text-xs text-gray-500">Small scratches, minor dents. Vehicle is still fully operational.</p>
+                  <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center severity-check transition-all">
+                  </div>
+                </button>
+
+                <button type="button" onclick="selectSeverity(this, 'moderate')" data-severity="moderate" class="severity-option group relative bg-white border-2 border-gray-200 rounded-xl p-5 text-center hover:border-amber-400 transition-all focus:outline-none">
+                  <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                    <i data-lucide="alert-circle" class="w-6 h-6 text-amber-500"></i>
+                  </div>
+                  <h3 class="font-semibold text-gray-800 mb-1">Moderate</h3>
+                  <p class="text-xs text-gray-500">Visible damage, cracked parts. Vehicle may need repair before continued use.</p>
+                  <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center severity-check transition-all">
+                  </div>
+                </button>
+
+                <button type="button" onclick="selectSeverity(this, 'severe')" data-severity="severe" class="severity-option group relative bg-white border-2 border-gray-200 rounded-xl p-5 text-center hover:border-red-400 transition-all focus:outline-none">
+                  <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                    <i data-lucide="alert-octagon" class="w-6 h-6 text-red-500"></i>
+                  </div>
+                  <h3 class="font-semibold text-gray-800 mb-1">Severe</h3>
+                  <p class="text-xs text-gray-500">Major structural or mechanical damage. Vehicle is not safe to drive.</p>
+                  <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center severity-check transition-all">
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description & Additional -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="align-left" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Description & Additional Info</h2>
+                  <p class="text-maroon-200 text-xs">Provide a detailed description of the incident</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Damage Description <span class="text-maroon-600">*</span></label>
+                <textarea id="damageDescription" rows="4" placeholder="Please describe what happened, how the damage occurred, and any relevant details..." class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent transition-all resize-y"></textarea>
+                <div class="flex justify-between mt-1">
+                  <span class="text-xs text-gray-400">Be as detailed as possible</span>
+                  <span id="charCount" class="text-xs text-gray-400">0 / 1000</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- Other vehicle involvement -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="car" class="w-4 h-4 text-gray-500"></i>
+                      <span class="text-sm font-medium text-gray-700">Other vehicle involved?</span>
+                    </div>
+                    <button type="button" id="otherVehicleToggle" onclick="toggleSwitch(this)" class="toggle-btn w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer flex-shrink-0">
+                      <div class="toggle-thumb w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 left-0.5"></div>
+                    </button>
+                  </div>
+                  <div id="otherVehicleFields" class="hidden mt-3 space-y-3">
+                    <input type="text" placeholder="Other vehicle's license plate" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent" />
+                    <input type="text" placeholder="Other driver's name" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent" />
+                  </div>
+                </div>
+
+                <!-- Police report -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="shield" class="w-4 h-4 text-gray-500"></i>
+                      <span class="text-sm font-medium text-gray-700">Police report filed?</span>
+                    </div>
+                    <button type="button" id="policeReportToggle" onclick="toggleSwitch(this)" class="toggle-btn w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer flex-shrink-0">
+                      <div class="toggle-thumb w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 left-0.5"></div>
+                    </button>
+                  </div>
+                  <div id="policeReportFields" class="hidden mt-3 space-y-3">
+                    <input type="text" placeholder="Police report number" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent" />
+                    <input type="text" placeholder="Police department name" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-maroon-500 focus:border-transparent" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== STEP 3: Photos & Review ==================== -->
+      <div id="step3" class="step-section">
+        <div class="space-y-6">
+
+          <!-- Photo Upload -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="camera" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Upload Photos</h2>
+                  <p class="text-maroon-200 text-xs">Add clear photos of the damage (max 5 photos, 10MB each)</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+              <!-- Upload Zone -->
+              <div id="uploadZone" class="upload-area rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                <input type="file" id="photoInput" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(event)" />
+                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-maroon-50 flex items-center justify-center">
+                  <i data-lucide="upload-cloud" class="w-7 h-7 text-maroon-600"></i>
+                </div>
+                <p class="text-sm font-medium text-gray-700 mb-1">Click to upload or drag and drop</p>
+                <p class="text-xs text-gray-400">PNG, JPG, WEBP up to 10MB</p>
+              </div>
+
+              <!-- Photo Previews -->
+              <div id="photoPreviewGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <!-- Photos will be added here -->
+              </div>
+
+              <!-- Photo tips -->
+              <div class="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <i data-lucide="lightbulb" class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0"></i>
+                <div class="text-xs text-blue-700">
+                  <p class="font-medium mb-1">Tips for better documentation:</p>
+                  <ul class="list-disc list-inside space-y-0.5">
+                    <li>Capture the overall context first (wide shot)</li>
+                    <li>Take close-ups of the actual damage</li>
+                    <li>Include a reference point (hand, coin) for scale</li>
+                    <li>Ensure good lighting and avoid blurry shots</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review & Submit -->
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-r from-maroon-700 to-maroon-900 px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="clipboard-check" class="w-4 h-4 text-white"></i>
+                </div>
+                <div>
+                  <h2 class="text-white font-semibold">Review & Submit</h2>
+                  <p class="text-maroon-200 text-xs">Please review your report before submitting</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6 space-y-4">
+              <!-- Summary cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="reviewSummary">
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                  <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Vehicle</p>
+                  <p class="text-sm font-semibold text-gray-800">Toyota Camry 2023</p>
+                  <p class="text-xs text-gray-500">ABC-1234</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                  <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Severity</p>
+                  <p id="reviewSeverity" class="text-sm font-semibold text-gray-800">Not selected</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                  <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Damage Types</p>
+                  <p id="reviewDamageTypes" class="text-sm font-semibold text-gray-800">None selected</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                  <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">Photos</p>
+                  <p id="reviewPhotos" class="text-sm font-semibold text-gray-800">0 uploaded</p>
+                </div>
+              </div>
+
+              <!-- Agreement -->
+              <div class="bg-maroon-50 border border-maroon-200 rounded-xl p-4">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" id="agreementCheck" class="mt-0.5 w-4 h-4 rounded border-maroon-300 text-maroon-700 focus:ring-maroon-500" />
+                  <span class="text-sm text-maroon-800">I declare that the information provided in this damage report is true and accurate to the best of my knowledge. I understand that providing false information may result in penalties as per the rental agreement.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <button type="button" id="prevBtn" onclick="prevStep()" class="hidden w-full sm:w-auto px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Previous Step
+        </button>
+        <div class="flex-1"></div>
+        <button type="button" id="nextBtn" onclick="nextStep()" class="w-full sm:w-auto px-8 py-3 bg-maroon-700 text-white rounded-xl text-sm font-semibold hover:bg-maroon-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-maroon-700/20">
+          Next Step
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <button type="submit" id="submitBtn" class="hidden w-full sm:w-auto px-8 py-3 bg-maroon-700 text-white rounded-xl text-sm font-semibold hover:bg-maroon-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-maroon-700/20">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          Submit Report
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-600"></i>
+      </div>
+      <h2 class="text-xl font-bold text-gray-900 mb-2">Report Submitted!</h2>
+      <p class="text-sm text-gray-500 mb-4">Your damage report has been submitted successfully. Our team will review it and contact you within 24 hours.</p>
+      <div class="bg-gray-50 rounded-lg p-3 mb-6">
+        <p class="text-xs text-gray-400">Report Reference</p>
+        <p id="reportRef" class="text-lg font-bold text-maroon-700">DMG-2024-0042</p>
+      </div>
+      <div class="flex flex-col gap-3">
+        <button onclick="closeModal()" class="w-full px-6 py-3 bg-maroon-700 text-white rounded-xl text-sm font-semibold hover:bg-maroon-800 transition-colors">
+          Back to Dashboard
+        </button>
+        <button onclick="closeModal()" class="w-full px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+          Track Report Status
+        </button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
