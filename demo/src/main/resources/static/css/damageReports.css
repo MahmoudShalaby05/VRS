@@ -1,5 +1,21 @@
 * { font-family: 'Inter', sans-serif; }
 
+/* Match shared pages navbar behavior on light background */
+#navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08);
+}
+
+#navbar .nav-link {
+  color: #4b5563;
+}
+
+#navbar .nav-link:hover,
+#navbar .nav-link.text-darkRed {
+  color: #8b0000;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
