@@ -134,6 +134,10 @@
     color: #fff;
 }
 
+a.book-btn {
+    text-decoration: none;
+}
+
 .whatsapp-btn {
     border: 1px solid #d1d5db;
 }

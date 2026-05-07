@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Vehicle Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkRed: '#8B0000',
+                        darkRedHover: '#6B0000',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="checkout-page bg-gray-50 min-h-screen font-inter">
+
+    <!-- Decorative Background Elements -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-darkRed/5 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-darkRed/5 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-darkRed/3 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="relative z-20 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between min-h-[5.25rem] h-24 px-0 py-2">
+                <a href="index.html" class="flex shrink-0 items-center checkout-nav-brand" aria-label="DriveRed Home">
+                    <img src="assets/images/logo.png" alt="DriveRed" class="nav-brand-logo">
+                </a>
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <i data-lucide="lock" class="w-4 h-4 text-green-600"></i>
+                    <span class="hidden sm:inline">Secure Checkout</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Stepper -->
+    <div class="relative z-10 max-w-4xl mx-auto px-4 pt-8 pb-2">
+        <div class="flex items-center justify-center gap-0" id="stepper">
+            <!-- Step 1 -->
+            <div class="flex flex-col items-center">
+                <div class="step-dot completed w-9 h-9 rounded-full border-2 border-darkRed bg-darkRed flex items-center justify-center">
+                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                </div>
+                <span class="text-xs font-medium text-darkRed mt-1.5">Vehicle</span>
+            </div>
+            <div class="step-line completed h-0.5 w-16 sm:w-24 bg-darkRed mt-[-12px]"></div>
+            <!-- Step 2 -->
+            <div class="flex flex-col items-center">
+                <div class="step-dot current w-9 h-9 rounded-full border-2 border-darkRed bg-white flex items-center justify-center">
+                    <span class="text-sm font-bold text-darkRed">2</span>
+                </div>
+                <span class="text-xs font-semibold text-darkRed mt-1.5">Checkout</span>
+            </div>
+            <div class="step-line h-0.5 w-16 sm:w-24 bg-gray-200 mt-[-12px]"></div>
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center">
+                <div class="step-dot w-9 h-9 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center">
+                    <span class="text-sm font-medium text-gray-400">3</span>
+                </div>
+                <span class="text-xs font-medium text-gray-400 mt-1.5">Confirm</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- LEFT: Checkout Form -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Rental Duration Section -->
+                <div class="slide-up slide-up-delay-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-darkRed/10 flex items-center justify-center">
+                            <i data-lucide="calendar-days" class="w-5 h-5 text-darkRed"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Rental Duration</h3>
+                            <p class="text-sm text-gray-500">Choose your rental period</p>
+                        </div>
+                    </div>
+
+                    <!-- Duration Pills -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6" id="durationPills">
+                        <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="daily" data-price="45" onclick="selectDuration(this)">
+                            <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Daily</p>
+                            <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$45</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">per day</p>
+                        </div>
+                        <div class="duration-pill active rounded-xl border-2 border-transparent p-3 text-center" data-type="weekly" data-price="280" onclick="selectDuration(this)">
+                            <p class="pill-label text-xs font-medium uppercase tracking-wider">Weekly</p>
+                            <p class="pill-price text-2xl font-extrabold mt-1">$280</p>
+                            <p class="text-[11px] mt-0.5 opacity-80">per week</p>
+                            <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 11%</span>
+                        </div>
+                        <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="monthly" data-price="980" onclick="selectDuration(this)">
+                            <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Monthly</p>
+                            <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$980</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">per month</p>
+                            <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 27%</span>
+                        </div>
+                        <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="yearly" data-price="9500" onclick="selectDuration(this)">
+                            <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Yearly</p>
+                            <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$9,500</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">per year</p>
+                            <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 42%</span>
+                        </div>
+                    </div>
+
+                    <!-- Date Pickers -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Pickup Date</label>
+                            <div class="relative">
+                                <input type="date" id="pickupDate" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" onchange="updateSummary()">
+                                <i data-lucide="calendar" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Return Date</label>
+                            <div class="relative">
+                                <input type="date" id="returnDate" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" onchange="updateSummary()">
+                                <i data-lucide="calendar" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duration Display -->
+                    <div class="mt-4 flex items-center gap-2 px-4 py-3 bg-darkRed/5 rounded-xl border border-darkRed/10">
+                        <i data-lucide="info" class="w-4 h-4 text-darkRed flex-shrink-0"></i>
+                        <p class="text-sm text-darkRed font-medium" id="durationInfo">Selected: Weekly rental at $280/week</p>
+                    </div>
+                </div>
+
+                <!-- Identification Section -->
+                <div class="slide-up slide-up-delay-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-darkRed/10 flex items-center justify-center">
+                            <i data-lucide="id-card" class="w-5 h-5 text-darkRed"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Identification</h3>
+                            <p class="text-sm text-gray-500">Verify your identity and driving eligibility</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <!-- ID Type Toggle -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ID Type</label>
+                            <div class="flex gap-3">
+                                <button class="id-toggle flex-1 py-3 px-4 rounded-xl border-2 border-darkRed bg-darkRed/5 text-sm font-semibold text-darkRed transition-all" data-type="national" onclick="selectIDType(this)">
+                                    <i data-lucide="fingerprint" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i>National ID
+                                </button>
+                                <button class="id-toggle flex-1 py-3 px-4 rounded-xl border-2 border-gray-200 bg-white text-sm font-semibold text-gray-500 transition-all hover:border-darkRed/30" data-type="passport" onclick="selectIDType(this)">
+                                    <i data-lucide="book-open" class="w-4 h-4 inline-block mr-1.5 -mt-0.5"></i>Passport
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ID Number -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2" id="idLabel">National ID Number</label>
+                            <div class="relative">
+                                <input type="text" id="idNumber" placeholder="Enter your ID number" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="20">
+                                <i data-lucide="fingerprint" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" id="idIcon"></i>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1.5" id="idHint">Your national identification number as shown on your ID card</p>
+                        </div>
+
+                        <!-- Driving License -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Driving License Number</label>
+                            <div class="relative">
+                                <input type="text" id="licenseNumber" placeholder="e.g. DL-12345678" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="20">
+                                <i data-lucide="credit-card" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- License Upload -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Driving License</label>
+                            <div class="upload-area border-2 border-dashed border-gray-200 rounded-xl p-6 text-center" id="uploadArea" onclick="document.getElementById('licenseFile').click()">
+                                <div id="uploadPlaceholder">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-darkRed/10 flex items-center justify-center mb-3">
+                                        <i data-lucide="upload-cloud" class="w-6 h-6 text-darkRed"></i>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-700">Drop your file here or <span class="text-darkRed font-semibold">browse</span></p>
+                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG or PDF up to 5MB</p>
+                                </div>
+                                <div id="uploadPreview" class="hidden">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                            <i data-lucide="file-check" class="w-5 h-5 text-green-600"></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <p class="text-sm font-medium text-gray-900" id="fileName">license.pdf</p>
+                                            <p class="text-xs text-gray-400" id="fileSize">2.4 MB</p>
+                                        </div>
+                                        <button class="ml-2 w-8 h-8 rounded-full bg-red-50 flex items-center justify-center hover:bg-red-100 transition" onclick="event.stopPropagation(); removeFile()">
+                                            <i data-lucide="x" class="w-4 h-4 text-red-500"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="file" id="licenseFile" class="hidden" accept="image/*,.pdf" onchange="handleFileUpload(event)">
+                            </div>
+                        </div>
+
+                        <!-- License Expiry -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">License Expiry Date</label>
+                            <input type="date" id="licenseExpiry" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Section -->
+                <div class="slide-up slide-up-delay-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-darkRed/10 flex items-center justify-center">
+                            <i data-lucide="wallet" class="w-5 h-5 text-darkRed"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Payment Method</h3>
+                            <p class="text-sm text-gray-500">Select your preferred payment method</p>
+                        </div>
+                    </div>
+
+                    <!-- Payment Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        <!-- Cash Payment -->
+                        <div class="payment-card rounded-2xl border-2 border-gray-200 bg-white p-5 selected" data-method="cash" onclick="selectPayment(this)">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
+                                        <i data-lucide="banknote" class="w-6 h-6 text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-900">Cash Payment</h4>
+                                        <p class="text-xs text-gray-400 mt-0.5">Pay at pickup</p>
+                                    </div>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-darkRed flex items-center justify-center">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-100">
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                                    <span>Pay the full amount when you pick up the vehicle</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visa Payment -->
+                        <div class="payment-card rounded-2xl border-2 border-gray-200 bg-white p-5" data-method="visa" onclick="selectPayment(this)">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                                        <svg class="w-8 h-5" viewBox="0 0 48 32" fill="none">
+                                            <rect width="48" height="32" rx="4" fill="#1A1F71"/>
+                                            <path d="M19.5 22h-3l1.9-12h3l-1.9 12zm12.7-11.7c-.6-.2-1.5-.5-2.7-.5-3 0-5.1 1.5-5.1 3.7 0 1.6 1.5 2.5 2.6 3.1 1.2.6 1.6.9 1.6 1.4 0 .8-.9 1.1-1.8 1.1-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.5c.7.3 2.1.6 3.5.6 3.2 0 5.2-1.5 5.2-3.8 0-1.3-.8-2.2-2.5-3-1.1-.5-1.7-.9-1.7-1.4 0-.5.6-1 1.7-1 1 0 1.7.2 2.2.4l.3.1.3-2.3zM34.4 10h-2.3c-.7 0-1.3.2-1.6.9l-4.5 11.1h3.2l.6-1.7h3.9l.4 1.7H37L34.4 10zm-3.8 8.1l1.2-3.2.4-1.1.3 1 .7 3.3h-2.6zM17 10l-3 8.2-.3-1.7c-.6-1.8-2.3-3.7-4.3-4.7l2.7 10.2h3.2l4.8-12H17z" fill="#fff"/>
+                                            <path d="M12.2 10H7.5l-.1.2c3.6.9 6 3 7 5.5l-1-4.8c-.2-.7-.7-.9-1.2-.9z" fill="#F9A533"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-900">Visa / Card</h4>
+                                        <p class="text-xs text-gray-400 mt-0.5">Pay now online</p>
+                                    </div>
+                                </div>
+                                <div class="check-circle w-6 h-6 rounded-full bg-darkRed flex items-center justify-center">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-white"></i>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-100">
+                                <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                    <span>Secure payment with 256-bit SSL encryption</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visa/Card Form (hidden by default) -->
+                    <div id="visaForm" class="hidden space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Cardholder Name</label>
+                                <div class="relative">
+                                    <input type="text" placeholder="John Doe" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none">
+                                    <i data-lucide="user" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Card Number</label>
+                                <div class="relative">
+                                    <input type="text" placeholder="4242 4242 4242 4242" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none tracking-wider" maxlength="19" id="cardNumber" oninput="formatCardNumber(this)">
+                                    <i data-lucide="credit-card" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="5" id="expiryDate" oninput="formatExpiry(this)">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">CVV</label>
+                                <div class="relative">
+                                    <input type="password" placeholder="•••" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="4">
+                                    <i data-lucide="help-circle" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-help"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card Preview -->
+                        <div class="relative mt-2 mx-auto max-w-sm">
+                            <div class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 shadow-2xl shadow-gray-900/40 overflow-hidden" style="aspect-ratio: 1.586;">
+                                <div class="absolute inset-0 opacity-20">
+                                    <div class="absolute top-0 right-0 w-40 h-40 bg-darkRed rounded-full blur-3xl"></div>
+                                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-red-600 rounded-full blur-3xl"></div>
+                                </div>
+                                <div class="relative z-10 h-full flex flex-col justify-between">
+                                    <div class="flex items-center justify-between">
+                                        <i data-lucide="credit-card" class="w-8 h-8 text-gray-400"></i>
+                                        <svg class="w-12 h-4" viewBox="0 0 48 16" fill="none"><circle cx="8" cy="8" r="8" fill="#EB001B" opacity="0.8"/><circle cx="20" cy="8" r="8" fill="#F79E1B" opacity="0.8"/><path d="M14 3a8 8 0 0 1 0 10 8 8 0 0 1 0-10z" fill="#FF5F00" opacity="0.8"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-400 text-xs font-mono tracking-widest" id="cardPreview">•••• •••• •••• ••••</p>
+                                    </div>
+                                    <div class="flex items-end justify-between">
+                                        <div>
+                                            <p class="text-[10px] text-gray-500 uppercase">Card Holder</p>
+                                            <p class="text-xs text-gray-300 font-medium">YOUR NAME</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-gray-500 uppercase">Expires</p>
+                                            <p class="text-xs text-gray-300 font-medium" id="expiryPreview">MM/YY</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cash Info (visible by default) -->
+                    <div id="cashInfo" class="space-y-4">
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-amber-800">Cash Payment Notice</h4>
+                                    <p class="text-xs text-amber-700 mt-1">Full payment must be made at the time of vehicle pickup. Please bring the exact amount. A refundable deposit of $200 will be required in cash.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <input type="checkbox" class="mt-1 w-4 h-4 rounded border-gray-300 text-darkRed focus:ring-darkRed/20 cursor-pointer">
+                            <span class="text-sm text-gray-600 group-hover:text-gray-900 transition">I understand that I need to bring the full payment amount plus a $200 refundable deposit at pickup</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-6">
+                    <div class="glass-card rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/50 overflow-hidden">
+                        <!-- Header -->
+                        <div class="p-5 sm:p-6 bg-gradient-to-br from-darkRed to-red-800 text-white relative overflow-hidden">
+                            <div class="absolute inset-0 opacity-10">
+                                <div class="absolute -top-10 -right-10 w-32 h-32 border-2 border-white rounded-full"></div>
+                                <div class="absolute -bottom-8 -left-8 w-24 h-24 border-2 border-white rounded-full"></div>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-lg font-bold">Order Summary</h3>
+                                <p class="text-xs text-red-200 mt-1">Review your rental details</p>
+                            </div>
+                        </div>
+
+                        <!-- Summary Details -->
+                        <div class="p-5 sm:p-6 space-y-4">
+                            
+
+                            <!-- Duration Info -->
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Duration</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="summaryDuration">Weekly</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Rate</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="summaryRate">$280/week</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Period</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="summaryPeriod">1 week</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Payment</span>
+                                    <span class="text-sm font-semibold text-gray-900" id="summaryPayment">Cash</span>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-100"></div>
+
+                            <!-- Pricing -->
+                            <div class="space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Subtotal</span>
+                                    <span class="text-sm font-medium text-gray-700" id="summarySubtotal">$280.00</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Insurance</span>
+                                    <span class="text-sm font-medium text-gray-700" id="summaryInsurance">$25.00</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Service Fee</span>
+                                    <span class="text-sm font-medium text-gray-700">$15.00</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-500">Tax (8%)</span>
+                                    <span class="text-sm font-medium text-gray-700" id="summaryTax">$25.60</span>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-200"></div>
+
+                            <!-- Total -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-base font-bold text-gray-900">Total</span>
+                                <span class="text-2xl font-extrabold text-darkRed" id="summaryTotal">$345.60</span>
+                            </div>
+
+                            <!-- Deposit Note -->
+                            <div class="flex items-center gap-2 px-3 py-2.5 bg-amber-50 rounded-lg border border-amber-100">
+                                <i data-lucide="info" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+                                <p class="text-xs text-amber-700" id="depositNote">+$200 refundable deposit required at pickup</p>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <div class="px-5 sm:px-6 pb-5 sm:pb-6">
+                            <button class="btn-primary w-full py-4 rounded-xl text-white font-bold text-base" onclick="handleCheckout()">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                                    Confirm & Pay
+                                </span>
+                            </button>
+                            <p class="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1">
+                                <i data-lucide="lock" class="w-3 h-3"></i>
+                                Your data is safe and encrypted
+                            </p>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="border-t border-gray-100 px-5 sm:px-6 py-4 space-y-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-gray-700">Free Cancellation</p>
+                                    <p class="text-[11px] text-gray-400">Up to 24h before pickup</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+                                    <i data-lucide="headphones" class="w-3.5 h-3.5 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-gray-700">24/7 Support</p>
+                                    <p class="text-[11px] text-gray-400">Always here to help</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
+                                    <i data-lucide="shield" class="w-3.5 h-3.5 text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-gray-700">Full Coverage</p>
+                                    <p class="text-[11px] text-gray-400">Insurance included</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="if(event.target===this) closeModal()">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center transform scale-95 opacity-0 transition-all duration-300" id="successContent">
+            <div class="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-5">
+                <i data-lucide="check-circle-2" class="w-10 h-10 text-green-600"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed! 🎉</h3>
+            <p class="text-sm text-gray-500 mb-6">Your vehicle has been reserved successfully. Check your email for the confirmation details.</p>
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Booking ID</span>
+                    <span class="font-mono font-bold text-gray-900">#DRV-<span id="bookingId">284756</span></span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Vehicle</span>
+                    <span class="font-semibold text-gray-900">Toyota Camry</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Payment</span>
+                    <span class="font-semibold text-gray-900" id="modalPayment">Cash</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Total</span>
+                    <span class="font-bold text-darkRed" id="modalTotal">$345.60</span>
+                </div>
+            </div>
+            <button class="btn-primary w-full py-3.5 rounded-xl text-white font-bold text-sm" onclick="closeModal()">
+                <span class="flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Download Receipt
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-3"></div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/checkout.js"></script>
+</body>
+</html>

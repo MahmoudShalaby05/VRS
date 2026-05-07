@@ -16,6 +16,11 @@ function populateDetails(car) {
     document.getElementById("heroImage").src = car.img;
     document.getElementById("heroImage").alt = car.name;
 
+    const reserveBtn = document.getElementById("reserveCarBtn");
+    if (reserveBtn) {
+        reserveBtn.href = `checkout.html?id=${encodeURIComponent(car.id)}`;
+    }
+
     const specGrid = document.getElementById("specGrid");
     const specs = [
         { label: "Category", value: car.category.toUpperCase() },
