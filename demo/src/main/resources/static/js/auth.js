@@ -3,6 +3,7 @@ const ADMIN_CREDENTIALS = {
     password: 'Admin1234!',
     name: 'Administrator'
 };
+const ADMIN_DASHBOARD_PATH = 'admin/Admin.html';
 
 function setFormStatus(elementId, message, isSuccess) {
     const statusEl = document.getElementById(elementId);
@@ -106,7 +107,7 @@ function handleLoginSubmit(event) {
         setAdminAuth();
         setFormStatus(statusId, 'Admin credentials verified. Redirecting...', true);
         setTimeout(() => {
-            window.location.href = 'admin-panel.html';
+            window.location.href = ADMIN_DASHBOARD_PATH;
         }, 1200);
         return;
     }
@@ -207,12 +208,14 @@ function handleAdminSubmit(event) {
     setAdminAuth();
     setFormStatus(statusId, 'Admin access granted. Redirecting...', true);
     setTimeout(() => {
-        window.location.href = 'admin-panel.html';
+        window.location.href = ADMIN_DASHBOARD_PATH;
     }, 1200);
 }
 
 function verifyAdminPanelAccess() {
-    if (!isAdminAuthenticated()) {
+    const path = window.location.pathname.toLowerCase();
+    const isAdminDashboard = path.includes('/admin/admin.html');
+    if (isAdminDashboard && !isAdminAuthenticated()) {
         window.location.href = 'admin.html';
     }
 }
@@ -257,7 +260,10 @@ function initAdminShortcut() {
         );
 
         if (isAdminShortcut) {
-            if (!window.location.pathname.endsWith('admin.html') && !window.location.pathname.endsWith('admin-panel.html')) {
+            const path = window.location.pathname.toLowerCase();
+            const onAdminLogin = path.endsWith('/admin.html');
+            const onAdminDashboard = path.includes('/admin/admin.html');
+            if (!onAdminLogin && !onAdminDashboard) {
                 window.location.href = 'admin.html';
             }
         }
