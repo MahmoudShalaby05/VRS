@@ -1,11 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
+    initPage();
+});
+
+async function initPage() {
     const params = new URLSearchParams(window.location.search);
     const carId = Number(params.get("id"));
-    const car = getCarById(carId) || CARS_DATA[0];
+    let car = null;
+
+    try {
+        if (carId) {
+            car = await fetchVehicleById(carId);
+        }
+    } catch (error) {
+        console.error("Could not load vehicle details by ID:", error);
+    }
+
+    if (!car) {
+        try {
+            const allCars = await fetchVehicles();
+            car = allCars[0] || null;
+        } catch (error) {
+            console.error("Could not load fallback vehicle list:", error);
+        }
+    }
+
+    if (!car) {
+        return;
+    }
 
     populateDetails(car);
     if (typeof lucide !== "undefined") lucide.createIcons();
-});
+}
 
 function populateDetails(car) {
     document.getElementById("carName").textContent = car.name;

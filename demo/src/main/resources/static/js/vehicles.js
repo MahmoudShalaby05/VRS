@@ -2,8 +2,15 @@ const compareList = new Set();
 const ITEMS_PER_PAGE = 10;
 let currentPage = 1;
 let currentCarsList = [];
+let CARS_DATA = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        CARS_DATA = await fetchVehicles();
+    } catch (error) {
+        console.error("Could not load vehicles from database:", error);
+        CARS_DATA = [];
+    }
     initDynamicFilters();
     wireUi();
     applyFilterAndSort();
@@ -140,7 +147,9 @@ function renderCars(list) {
     const pagedCars = list.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     const endIndex = list.length === 0 ? 0 : Math.min(startIndex + ITEMS_PER_PAGE, list.length);
 
-    resultsCount.textContent = `Showing ${list.length === 0 ? 0 : startIndex + 1}-${endIndex} of ${list.length} cars`;
+    resultsCount.textContent = list.length === 0
+        ? "No cars found. Try changing filters."
+        : `Showing ${startIndex + 1}-${endIndex} of ${list.length} cars`;
     carsGrid.innerHTML = pagedCars
         .map((car) => {
             const compared = compareList.has(car.id);
