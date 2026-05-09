@@ -52,6 +52,7 @@ let userCounter = 7;
 // VEHICLE API
 // ===========================
 const VEHICLE_API_URL = '/api/vehicles';
+const AUTH_USERS_API_URL = '/api/auth/users';
 
 function mapVehicleFromApi(vehicle) {
     const status = vehicle.availabilityStatus || 'Available';
@@ -105,6 +106,34 @@ async function loadVehiclesFromDb() {
     }
     const data = await response.json();
     store.vehicles = data.map(mapVehicleFromApi);
+}
+
+function mapUserFromApi(user) {
+    const parts = String(user.name || '').trim().split(/\s+/).filter(Boolean);
+    const firstName = parts[0] || 'User';
+    const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+    const joined = user.createdAt ? String(user.createdAt).split('T')[0] : new Date().toISOString().split('T')[0];
+
+    return {
+        id: `USR-${user.id}`,
+        firstName,
+        lastName,
+        email: user.email || '',
+        phone: user.phone || '',
+        role: 'Staff',
+        status: 'Active',
+        joined,
+        avatar: null
+    };
+}
+
+async function loadUsersFromDb() {
+    const response = await fetch(AUTH_USERS_API_URL);
+    if (!response.ok) {
+        throw new Error(`Failed to load users (${response.status})`);
+    }
+    const data = await response.json();
+    store.users = data.map(mapUserFromApi);
 }
 
 // ===========================
@@ -1251,6 +1280,12 @@ async function init() {
     } catch (error) {
         console.error(error);
         showToast('Failed to load vehicles from database', 'error');
+    }
+    try {
+        await loadUsersFromDb();
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to load users from database', 'error');
     }
     refreshDashboard();
     renderVehicles();

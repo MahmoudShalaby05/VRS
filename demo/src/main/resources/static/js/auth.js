@@ -4,6 +4,7 @@ const ADMIN_CREDENTIALS = {
     name: 'Administrator'
 };
 const ADMIN_DASHBOARD_PATH = 'admin/Admin.html';
+const AUTH_API_BASE = '/api/auth';
 
 function setFormStatus(elementId, message, isSuccess) {
     const statusEl = document.getElementById(elementId);
@@ -84,7 +85,37 @@ function isAdminAuthenticated() {
     return localStorage.getItem('driveRedAdminAuth') === 'true';
 }
 
-function handleLoginSubmit(event) {
+async function registerUserApi(payload) {
+    const response = await fetch(`${AUTH_API_BASE}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Register failed (${response.status})`);
+    }
+
+    return response.json();
+}
+
+async function loginUserApi(payload) {
+    const response = await fetch(`${AUTH_API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Login failed (${response.status})`);
+    }
+
+    return response.json();
+}
+
+async function handleLoginSubmit(event) {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
@@ -112,21 +143,20 @@ function handleLoginSubmit(event) {
         return;
     }
 
-    const users = getStoredUsers();
-    const user = users[email.toLowerCase()];
-
-    if (!user || user.password !== password) {
+    try {
+        const user = await loginUserApi({ email, password });
+        localStorage.setItem('driveRedUserSession', JSON.stringify(user));
+        setFormStatus(statusId, `Welcome back, ${user.name.split(' ')[0]}! Redirecting...`, true);
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1200);
+    } catch (error) {
+        console.error('Login failed:', error);
         setFormStatus(statusId, 'Incorrect email or password.', false);
-        return;
     }
-
-    setFormStatus(statusId, `Welcome back, ${user.name.split(' ')[0]}! Redirecting...`, true);
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 1200);
 }
 
-function handleRegisterSubmit(event) {
+async function handleRegisterSubmit(event) {
     event.preventDefault();
     const name = document.getElementById('registerName').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
@@ -162,24 +192,33 @@ function handleRegisterSubmit(event) {
         return;
     }
 
-    const users = getStoredUsers();
     const normalizedEmail = email.toLowerCase();
-    if (users[normalizedEmail]) {
-        setFormStatus(statusId, 'A user with that email already exists.', false);
-        return;
-    }
     if (normalizedEmail === ADMIN_CREDENTIALS.email) {
         setFormStatus(statusId, 'That email is reserved for admin access.', false);
         return;
     }
 
-    users[normalizedEmail] = { name, email: normalizedEmail, phone, password };
-    saveStoredUsers(users);
+    try {
+        await registerUserApi({
+            name,
+            email: normalizedEmail,
+            phone,
+            password
+        });
 
-    setFormStatus(statusId, 'Account created successfully. Redirecting to login...', true);
-    setTimeout(() => {
-        window.location.href = 'login.html';
-    }, 1200);
+        setFormStatus(statusId, 'Account created successfully. Redirecting to login...', true);
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1200);
+    } catch (error) {
+        console.error('Registration failed:', error);
+        const message = String(error.message || '').toLowerCase();
+        if (message.includes('conflict') || message.includes('already exists')) {
+            setFormStatus(statusId, 'A user with that email already exists.', false);
+            return;
+        }
+        setFormStatus(statusId, 'Could not create account. Please try again.', false);
+    }
 }
 
 function handleAdminSubmit(event) {
