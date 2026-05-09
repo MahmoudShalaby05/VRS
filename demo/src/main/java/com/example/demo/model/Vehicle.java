@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,9 +30,13 @@ public class Vehicle {
     private Double rating;
     private Integer matchScore;
     private String badge;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String imageUrl;
     private String description;
     private Double pricePerDay;
+    private String plateNumber;
+    private String availabilityStatus;
 
     public Vehicle() {
     }
@@ -197,5 +203,21 @@ public class Vehicle {
 
     public void setPricePerDay(Double pricePerDay) {
         this.pricePerDay = pricePerDay;
+    }
+
+    public String getPlateNumber() {
+        return plateNumber;
+    }
+
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
+    }
+
+    public String getAvailabilityStatus() {
+        return availabilityStatus;
+    }
+
+    public void setAvailabilityStatus(String availabilityStatus) {
+        this.availabilityStatus = availabilityStatus;
     }
 }

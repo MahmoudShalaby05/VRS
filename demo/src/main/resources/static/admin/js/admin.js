@@ -2,16 +2,7 @@
 // DATA STORE
 // ===========================
 const store = {
-    vehicles: [
-        { id: 'VH-001', make: 'Toyota', model: 'Camry', year: 2024, type: 'Sedan', plate: 'NYC-1234', rate: 75, status: 'Available', photo: null },
-        { id: 'VH-002', make: 'Honda', model: 'CR-V', year: 2023, type: 'SUV', plate: 'NYC-5678', rate: 95, status: 'Booked', photo: null },
-        { id: 'VH-003', make: 'Ford', model: 'F-150', year: 2024, type: 'Truck', plate: 'LA-9012', rate: 110, status: 'Available', photo: null },
-        { id: 'VH-004', make: 'Chevrolet', model: 'Tahoe', year: 2023, type: 'SUV', plate: 'CHI-3456', rate: 120, status: 'Maintenance', photo: null },
-        { id: 'VH-005', make: 'Mercedes', model: 'E-Class', year: 2024, type: 'Luxury', plate: 'MIA-7890', rate: 200, status: 'Booked', photo: null },
-        { id: 'VH-006', make: 'RAM', model: '1500', year: 2023, type: 'Truck', plate: 'DAL-2345', rate: 105, status: 'Available', photo: null },
-        { id: 'VH-007', make: 'BMW', model: '5 Series', year: 2024, type: 'Luxury', plate: 'SF-6789', rate: 185, status: 'Available', photo: null },
-        { id: 'VH-008', make: 'Toyota', model: 'Sienna', year: 2023, type: 'Van', plate: 'BOS-0123', rate: 90, status: 'Booked', photo: null },
-    ],
+    vehicles: [],
     bookings: [
         { id: 'BK-001', customer: 'Alice Johnson', vehicleId: 'VH-002', startDate: '2025-01-10', endDate: '2025-01-15', status: 'Confirmed', amount: 475 },
         { id: 'BK-002', customer: 'Bob Williams', vehicleId: 'VH-005', startDate: '2025-01-12', endDate: '2025-01-18', status: 'Confirmed', amount: 1200 },
@@ -52,10 +43,69 @@ const store = {
 // ===========================
 // ID COUNTERS
 // ===========================
-let vehicleCounter = 9;
+let vehicleCounter = 1;
 let bookingCounter = 9;
 let damageCounter = 7;
 let userCounter = 7;
+
+// ===========================
+// VEHICLE API
+// ===========================
+const VEHICLE_API_URL = '/api/vehicles';
+
+function mapVehicleFromApi(vehicle) {
+    const status = vehicle.availabilityStatus || 'Available';
+    return {
+        id: String(vehicle.id),
+        make: vehicle.brand || 'Unknown',
+        model: vehicle.name || 'Vehicle',
+        year: vehicle.modelYear || new Date().getFullYear(),
+        type: vehicle.category || 'Sedan',
+        plate: vehicle.plateNumber || '',
+        rate: Number(vehicle.pricePerDay || 0),
+        status,
+        photo: vehicle.imageUrl || null,
+        city: vehicle.city || 'Cairo',
+        seats: Number(vehicle.seats || 5),
+        transmission: vehicle.transmission || 'Auto',
+        fuel: vehicle.fuel || 'Petrol',
+        engine: vehicle.engine || '',
+        description: vehicle.description || `${vehicle.brand || ''} ${vehicle.name || 'Vehicle'}`
+    };
+}
+
+function mapVehicleToApi(vehicle) {
+    return {
+        name: vehicle.model,
+        brand: vehicle.make,
+        category: vehicle.type,
+        modelYear: Number(vehicle.year),
+        city: vehicle.city || 'Cairo',
+        seats: Number(vehicle.seats || 5),
+        transmission: vehicle.transmission || 'Auto',
+        fuel: vehicle.fuel || 'Petrol',
+        engine: vehicle.engine || '',
+        luggage: '2 Bags',
+        dailyKm: 250,
+        rating: 4.6,
+        matchScore: 95,
+        badge: vehicle.type || 'Popular',
+        imageUrl: vehicle.photo || '',
+        description: vehicle.description || `${vehicle.make} ${vehicle.model}`,
+        pricePerDay: Number(vehicle.rate || 0),
+        plateNumber: vehicle.plate || '',
+        availabilityStatus: vehicle.status || 'Available'
+    };
+}
+
+async function loadVehiclesFromDb() {
+    const response = await fetch(VEHICLE_API_URL);
+    if (!response.ok) {
+        throw new Error(`Failed to load vehicles (${response.status})`);
+    }
+    const data = await response.json();
+    store.vehicles = data.map(mapVehicleFromApi);
+}
 
 // ===========================
 // NAVIGATION
@@ -394,12 +444,16 @@ function renderVehicles() {
         const typeIcon = {
             'Sedan': 'car',
             'SUV': 'car',
+            'Hatchback': 'car',
+            'Electric': 'battery-charging',
+            'Hybrid': 'leaf',
+            'Sports': 'zap',
             'Truck': 'truck',
             'Van': 'car',
             'Luxury': 'sparkles',
         }[v.type] || 'car';
 
-        const imgSrc = v.photo || `https://picsum.photos/seed/${v.id}/640/360`;
+        const imgSrc = v.photo || `https://picsum.photos/seed/vehicle-${v.id}/640/360`;
 
         return `
             <div class="vehicle-card bg-dark-700 border border-dark-500 rounded-xl overflow-hidden">
@@ -425,10 +479,10 @@ function renderVehicles() {
                         <span class="flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3 h-3"></i>${v.rate}/day</span>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="editVehicle('${v.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-lg transition-colors">
+                        <button onclick="editVehicle('${String(v.id)}')" class="flex-1 flex items-center justify-center gap-1.5 py-2 bg-dark-600 hover:bg-dark-500 text-white text-xs font-medium rounded-lg transition-colors">
                             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>Edit
                         </button>
-                        <button onclick="deleteItem('vehicle', '${v.id}')" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium rounded-lg transition-colors">
+                        <button onclick="deleteItem('vehicle', '${String(v.id)}')" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium rounded-lg transition-colors">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
@@ -450,7 +504,7 @@ function openVehicleModal(editId = null) {
     resetVehiclePhotoPreview();
 
     if (editId) {
-        const vehicle = store.vehicles.find(v => v.id === editId);
+        const vehicle = store.vehicles.find(v => String(v.id) === String(editId));
         if (!vehicle) return;
         title.textContent = 'Edit Vehicle';
         document.getElementById('vehicleEditId').value = vehicle.id;
@@ -458,6 +512,7 @@ function openVehicleModal(editId = null) {
         document.getElementById('vehicleModel').value = vehicle.model;
         document.getElementById('vehicleYear').value = vehicle.year;
         document.getElementById('vehicleType').value = vehicle.type;
+        document.getElementById('vehicleFuel').value = vehicle.fuel || 'Petrol';
         document.getElementById('vehiclePlate').value = vehicle.plate;
         document.getElementById('vehicleRate').value = vehicle.rate;
         document.getElementById('vehicleStatus').value = vehicle.status;
@@ -490,7 +545,7 @@ function editVehicle(id) {
     openVehicleModal(id);
 }
 
-function saveVehicle(e) {
+async function saveVehicle(e) {
     e.preventDefault();
 
     const editId = document.getElementById('vehicleEditId').value;
@@ -498,31 +553,80 @@ function saveVehicle(e) {
     const model = document.getElementById('vehicleModel').value.trim();
     const year = parseInt(document.getElementById('vehicleYear').value);
     const type = document.getElementById('vehicleType').value;
+    const fuel = document.getElementById('vehicleFuel').value;
     const plate = document.getElementById('vehiclePlate').value.trim().toUpperCase();
     const rate = parseInt(document.getElementById('vehicleRate').value);
     const status = document.getElementById('vehicleStatus').value;
     const photo = document.getElementById('vehiclePhotoInput').dataset.preview || null;
 
-    if (!make || !model || !year || !type || !plate || !rate || !status) {
+    if (!make || !model || !year || !type || !fuel || !plate || !rate || !status) {
         showToast('Please fill all required fields', 'error');
         return;
     }
 
-    if (editId) {
-        const idx = store.vehicles.findIndex(v => v.id === editId);
-        if (idx !== -1) {
-            store.vehicles[idx] = { ...store.vehicles[idx], make, model, year, type, plate, rate, status, photo: photo || store.vehicles[idx].photo };
-            showToast(`Vehicle ${editId} updated successfully`, 'success');
-        }
-    } else {
-        const newId = `VH-${String(vehicleCounter++).padStart(3, '0')}`;
-        store.vehicles.push({ id: newId, make, model, year, type, plate, rate, status, photo });
-        showToast(`Vehicle ${newId} added successfully`, 'success');
-    }
+    try {
+        if (editId) {
+            const idx = store.vehicles.findIndex(v => String(v.id) === String(editId));
+            if (idx !== -1) {
+                const updatedVehicle = {
+                    ...store.vehicles[idx],
+                    make,
+                    model,
+                    year,
+                    type,
+                    fuel,
+                    plate,
+                    rate,
+                    status,
+                    photo: photo || store.vehicles[idx].photo
+                };
 
-    closeVehicleModal();
-    renderVehicles();
-    refreshDashboard();
+                const response = await fetch(`${VEHICLE_API_URL}/${editId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mapVehicleToApi(updatedVehicle))
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Update failed (${response.status}): ${errorText}`);
+                }
+                store.vehicles[idx] = mapVehicleFromApi(await response.json());
+                showToast(`Vehicle ${editId} updated successfully`, 'success');
+            }
+        } else {
+            const newVehicle = {
+                id: String(vehicleCounter++),
+                make,
+                model,
+                year,
+                type,
+                fuel,
+                plate,
+                rate,
+                status,
+                photo
+            };
+            const response = await fetch(VEHICLE_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mapVehicleToApi(newVehicle))
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Create failed (${response.status}): ${errorText}`);
+            }
+            const created = mapVehicleFromApi(await response.json());
+            store.vehicles.push(created);
+            showToast(`Vehicle ${created.id} added successfully`, 'success');
+        }
+
+        closeVehicleModal();
+        renderVehicles();
+        refreshDashboard();
+    } catch (error) {
+        console.error(error);
+        showToast('Could not save vehicle to database', 'error');
+    }
 }
 
 // ===========================
@@ -1017,14 +1121,24 @@ function closeDeleteModal() {
     store.deleteContext = null;
 }
 
-function confirmDelete() {
+async function confirmDelete() {
     if (!store.deleteContext) return;
 
     const { type, id } = store.deleteContext;
 
     switch (type) {
         case 'vehicle':
-            store.vehicles = store.vehicles.filter(v => v.id !== id);
+            try {
+                const response = await fetch(`${VEHICLE_API_URL}/${id}`, { method: 'DELETE' });
+                if (!response.ok && response.status !== 204) {
+                    throw new Error(`Delete failed (${response.status})`);
+                }
+                store.vehicles = store.vehicles.filter(v => String(v.id) !== String(id));
+            } catch (error) {
+                console.error(error);
+                showToast('Could not delete vehicle from database', 'error');
+                return;
+            }
             renderVehicles();
             break;
         case 'booking':
@@ -1067,10 +1181,11 @@ function closeAdminProfile() {
 
 function handleLogout() {
     closeAdminProfile();
-    showToast('Logged out successfully. Redirecting...', 'info');
+    localStorage.removeItem('driveRedAdminAuth');
+    showToast('Logged out successfully. Redirecting to homepage...', 'info');
     setTimeout(() => {
-        showToast('This is a demo — logout simulated!', 'warning');
-    }, 2000);
+        window.location.href = '../index.html';
+    }, 500);
 }
 
 // ===========================
@@ -1129,8 +1244,14 @@ function autoCalcBookingAmount() {
 // ===========================
 // INIT
 // ===========================
-function init() {
+async function init() {
     lucide.createIcons();
+    try {
+        await loadVehiclesFromDb();
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to load vehicles from database', 'error');
+    }
     refreshDashboard();
     renderVehicles();
     renderBookings();

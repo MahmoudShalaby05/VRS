@@ -17,15 +17,23 @@ async function fetchVehicleById(id) {
 }
 
 function mapVehicleFromApi(vehicle) {
-    const category = (vehicle.category || "sedan").toLowerCase();
+    const rawCategory = (vehicle.category || "sedan").toLowerCase();
+    const category = (rawCategory === "performance" || rawCategory === "sport" || rawCategory === "sports")
+        ? "sports"
+        : rawCategory;
     const typeMap = {
         sedan: "Sedan",
         suv: "SUV",
         hatchback: "Hatchback",
         luxury: "Luxury",
         electric: "Electric",
-        hybrid: "Hybrid"
+        hybrid: "Hybrid",
+        sports: "Sports"
     };
+
+    const primaryBadge = vehicle.badge === "Performance"
+        ? "Sports"
+        : (vehicle.badge || "Popular");
 
     return {
         id: vehicle.id,
@@ -44,7 +52,7 @@ function mapVehicleFromApi(vehicle) {
         price: vehicle.pricePerDay ?? 0,
         rating: vehicle.rating ?? 4.5,
         match: vehicle.matchScore ?? 90,
-        badges: [vehicle.badge || "Popular"],
+        badges: [primaryBadge],
         img: vehicle.imageUrl || "http://static.photos/automotive/640x360/1",
         description: vehicle.description || "Vehicle details are available."
     };
