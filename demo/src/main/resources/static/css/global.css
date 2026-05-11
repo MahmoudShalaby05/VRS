@@ -107,6 +107,19 @@ body {
     filter: brightness(0) invert(1);
 }
 
+/* Top navigation brand (home navbar, checkout bar, etc.) */
+.nav-brand-logo {
+    height: 5rem;
+    width: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 640px) {
+    .nav-brand-logo {
+        height: 4.25rem;
+    }
+}
+
 /* === Auth Page Styles === */
 .auth-card {
     background: rgba(255, 255, 255, 0.06);
