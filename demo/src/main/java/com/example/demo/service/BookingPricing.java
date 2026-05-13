@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.service.pricing.PricingPlanStrategy;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,12 +25,7 @@ public final class BookingPricing {
         if (planType == null) {
             return 0;
         }
-        return switch (planType.trim().toUpperCase()) {
-            case "WEEKLY" -> 11.0;
-            case "MONTHLY" -> 27.0;
-            case "YEARLY" -> 42.0;
-            default -> 0.0;
-        };
+        return PricingPlanStrategy.fromNormalizedPlan(planType.trim().toUpperCase()).packageDiscountPercent();
     }
 
     public static void validateDateRange(LocalDate pickup, LocalDate returnDate) {
@@ -70,12 +66,7 @@ public final class BookingPricing {
      */
     public static LocalDate firstPackagePeriodEnd(LocalDate pickup, String planType) {
         String p = normalizePlanType(planType);
-        return switch (p) {
-            case "WEEKLY" -> pickup.plusWeeks(1);
-            case "MONTHLY" -> pickup.plusMonths(1);
-            case "YEARLY" -> pickup.plusYears(1);
-            default -> pickup.plusDays(1);
-        };
+        return PricingPlanStrategy.fromNormalizedPlan(p).firstPackagePeriodEnd(pickup);
     }
 
     /**
@@ -107,19 +98,15 @@ public final class BookingPricing {
         if (totalDays < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rental must be at least one day");
         }
-        if ("DAILY".equals(p)) {
+        PricingPlanStrategy plan = PricingPlanStrategy.fromNormalizedPlan(p);
+        if (plan == PricingPlanStrategy.DAILY) {
             return round2(totalDays * pricePerDay);
         }
-        double planDisc = discountPercentForPlan(p) / 100.0;
+        double planDisc = plan.packageDiscountPercent() / 100.0;
         double subtotal = 0.0;
         LocalDate pos = pickup;
         while (pos.isBefore(returnDate)) {
-            LocalDate boundary = switch (p) {
-                case "WEEKLY" -> pos.plusWeeks(1);
-                case "MONTHLY" -> pos.plusMonths(1);
-                case "YEARLY" -> pos.plusYears(1);
-                default -> returnDate;
-            };
+            LocalDate boundary = plan.rawNextBoundary(pos, returnDate);
             LocalDate segEnd = boundary.isBefore(returnDate) ? boundary : returnDate;
             int days = (int) ChronoUnit.DAYS.between(pos, segEnd);
             if (days <= 0) {
