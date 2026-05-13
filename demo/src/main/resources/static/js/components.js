@@ -40,14 +40,19 @@ async function initComponents() {
 function initNavbarScroll() {
     const navbar = document.getElementById('navbar');
     if (!navbar) return;
+    const forceLightNavbar = document.body.classList.contains('light-navbar');
     
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 80) {
+        if (forceLightNavbar || window.scrollY > 80) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
     });
+
+    if (forceLightNavbar) {
+        navbar.classList.add('scrolled');
+    }
 }
 
 // === Mobile Menu Functions ===

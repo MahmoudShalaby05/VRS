@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -29,10 +31,33 @@ public class UserDamageReport {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental_booking_id")
+    private RentalBooking rentalBooking;
+
     private String description;
     private String severity;
     private String status;
     private LocalDate incidentDate;
+
+    @Column(name = "incident_time", length = 16)
+    private String incidentTime;
+
+    @Column(name = "incident_location", length = 500)
+    private String incidentLocation;
+
+    @Lob
+    @Column(name = "damage_types_json", columnDefinition = "LONGTEXT")
+    private String damageTypesJson;
+
+    @Lob
+    @Column(name = "body_locations_json", columnDefinition = "LONGTEXT")
+    private String bodyLocationsJson;
+
+    @Lob
+    @Column(name = "photos_json", columnDefinition = "LONGTEXT")
+    private String photosJson;
+
     private Double estimatedCost;
     private LocalDateTime createdAt;
 
@@ -61,4 +86,22 @@ public class UserDamageReport {
     public void setEstimatedCost(Double estimatedCost) { this.estimatedCost = estimatedCost; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public RentalBooking getRentalBooking() { return rentalBooking; }
+    public void setRentalBooking(RentalBooking rentalBooking) { this.rentalBooking = rentalBooking; }
+
+    public String getIncidentTime() { return incidentTime; }
+    public void setIncidentTime(String incidentTime) { this.incidentTime = incidentTime; }
+
+    public String getIncidentLocation() { return incidentLocation; }
+    public void setIncidentLocation(String incidentLocation) { this.incidentLocation = incidentLocation; }
+
+    public String getDamageTypesJson() { return damageTypesJson; }
+    public void setDamageTypesJson(String damageTypesJson) { this.damageTypesJson = damageTypesJson; }
+
+    public String getBodyLocationsJson() { return bodyLocationsJson; }
+    public void setBodyLocationsJson(String bodyLocationsJson) { this.bodyLocationsJson = bodyLocationsJson; }
+
+    public String getPhotosJson() { return photosJson; }
+    public void setPhotosJson(String photosJson) { this.photosJson = photosJson; }
 }

@@ -148,7 +148,19 @@ async function handleLoginSubmit(event) {
         localStorage.setItem('driveRedUserSession', JSON.stringify(user));
         setFormStatus(statusId, `Welcome back, ${user.name.split(' ')[0]}! Redirecting...`, true);
         setTimeout(() => {
-            window.location.href = 'index.html';
+            let redirectTo = 'index.html';
+            const raw = new URLSearchParams(window.location.search).get('next');
+            if (raw) {
+                try {
+                    const u = new URL(raw, window.location.origin);
+                    if (u.origin === window.location.origin) {
+                        redirectTo = u.pathname + u.search + u.hash;
+                    }
+                } catch (e) {
+                    redirectTo = 'index.html';
+                }
+            }
+            window.location.href = redirectTo;
         }, 1200);
     } catch (error) {
         console.error('Login failed:', error);

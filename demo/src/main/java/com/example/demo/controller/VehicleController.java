@@ -35,6 +35,9 @@ public class VehicleController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
+        if (vehicle.getAvailabilityStatus() == null || vehicle.getAvailabilityStatus().isBlank()) {
+            vehicle.setAvailabilityStatus("Available");
+        }
         return vehicleRepository.save(vehicle);
     }
 

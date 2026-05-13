@@ -1,20 +1,184 @@
 (function () {
+    const MAX_RENTAL_DAYS = 365 * 3;
+    const SERVICE_FEE = 15;
+    const TAX_RATE = 0.08;
+
+    const PLAN_DISCOUNTS = { DAILY: 0, WEEKLY: 11, MONTHLY: 27, YEARLY: 42 };
+
     let selectedDuration = 'weekly';
-    let selectedPrice = 280;
     let selectedPaymentMethod = 'cash';
     let uploadedFile = null;
+    let loadedVehicle = null;
+    let pricePerDay = 0;
 
-    function formatDate(date) {
-        return date.toISOString().split('T')[0];
+    function formatDate(d) {
+        return d.toISOString().split('T')[0];
+    }
+
+    function pad2(n) {
+        return String(n).padStart(2, '0');
+    }
+
+    function formatYMDLocal(d) {
+        return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    }
+
+    function parseYMD(s) {
+        const [y, m, da] = s.split('-').map(Number);
+        return new Date(y, m - 1, da);
+    }
+
+    function addDaysLocal(d, n) {
+        const x = new Date(d.getTime());
+        x.setDate(x.getDate() + n);
+        return x;
+    }
+
+    function rentalDaysBetween(pickupStr, returnStr) {
+        const a = parseYMD(pickupStr);
+        const b = parseYMD(returnStr);
+        return Math.round((b - a) / (1000 * 60 * 60 * 24));
+    }
+
+    function addCalendarMonths(date, months) {
+        const d = new Date(date.getTime());
+        const day = d.getDate();
+        d.setMonth(d.getMonth() + months);
+        if (d.getDate() < day) d.setDate(0);
+        return d;
+    }
+
+    function addOneYear(date) {
+        const d = new Date(date.getTime());
+        d.setFullYear(d.getFullYear() + 1);
+        return d;
+    }
+
+    /** First full package boundary from pickup (matches server: weekly +7d, monthly +1 calendar month, yearly +1 year). */
+    function firstPackageEndDate(pickupDate, planKey) {
+        const pk = String(planKey).toLowerCase();
+        if (pk === 'weekly') return addDaysLocal(pickupDate, 7);
+        if (pk === 'monthly') return addCalendarMonths(pickupDate, 1);
+        if (pk === 'yearly') return addOneYear(pickupDate);
+        return addDaysLocal(pickupDate, 1);
+    }
+
+    function minReturnYmd(pickupStr, planKey) {
+        const pk = String(planKey).toLowerCase();
+        if (!pickupStr) return '';
+        const pu = parseYMD(pickupStr);
+        if (pk === 'daily') return formatYMDLocal(addDaysLocal(pu, 1));
+        return formatYMDLocal(firstPackageEndDate(pu, pk));
+    }
+
+    /** On plan change: snap to one full period. On pickup change: only raise return if it became invalid. */
+    function applyDefaultReturnForPlan(forceSnapToFirstPeriod) {
+        const pickupEl = document.getElementById('pickupDate');
+        const returnEl = document.getElementById('returnDate');
+        if (!pickupEl || !returnEl || !pickupEl.value) return;
+        const pu = pickupEl.value;
+        const pk = selectedDuration;
+        if (pk === 'daily') {
+            const minR = formatYMDLocal(addDaysLocal(parseYMD(pu), 1));
+            if (forceSnapToFirstPeriod || !returnEl.value || returnEl.value < minR) returnEl.value = minR;
+            return;
+        }
+        const target = formatYMDLocal(firstPackageEndDate(parseYMD(pu), pk));
+        if (forceSnapToFirstPeriod) {
+            returnEl.value = target;
+        } else if (!returnEl.value || returnEl.value < target) {
+            returnEl.value = target;
+        }
+    }
+
+    function computeSubtotalSegments(pickupStr, returnStr, planKey, pd) {
+        const planU = String(planKey || 'daily').toUpperCase();
+        const days = rentalDaysBetween(pickupStr, returnStr);
+        if (days < 1 || pd <= 0) return 0;
+        if (planU === 'DAILY') return Math.round(days * pd * 100) / 100;
+        const disc = (PLAN_DISCOUNTS[planU] ?? 0) / 100;
+        let pos = parseYMD(pickupStr);
+        const end = parseYMD(returnStr);
+        let sub = 0;
+        while (pos < end) {
+            let boundary;
+            if (planU === 'WEEKLY') boundary = addDaysLocal(pos, 7);
+            else if (planU === 'MONTHLY') boundary = addCalendarMonths(pos, 1);
+            else if (planU === 'YEARLY') boundary = addOneYear(pos);
+            else boundary = addDaysLocal(pos, 1);
+            const segEnd = boundary < end ? boundary : end;
+            const ddays = Math.round((segEnd - pos) / (1000 * 60 * 60 * 24));
+            if (ddays <= 0) break;
+            const fullSeg = segEnd.getTime() === boundary.getTime();
+            if (fullSeg) sub += ddays * pd * (1 - disc);
+            else sub += ddays * pd;
+            pos = segEnd;
+        }
+        return Math.round(sub * 100) / 100;
+    }
+
+    function computePriceFromDates(pickupStr, returnStr, planKey, pd) {
+        const days = rentalDaysBetween(pickupStr, returnStr);
+        const subtotal = days > 0 ? computeSubtotalSegments(pickupStr, returnStr, planKey, pd) : 0;
+        const insurance = Math.round(Math.min(10 * days, 700) * 100) / 100;
+        const serviceFee = SERVICE_FEE;
+        const tax = Math.round((subtotal + insurance + serviceFee) * TAX_RATE * 100) / 100;
+        const total = Math.round((subtotal + insurance + serviceFee + tax) * 100) / 100;
+        const disc = PLAN_DISCOUNTS[String(planKey || 'daily').toUpperCase()] ?? 0;
+        return { subtotal, insurance, serviceFee, tax, total, disc };
+    }
+
+    function discountPercent(planKey) {
+        return PLAN_DISCOUNTS[String(planKey || 'daily').toUpperCase()] ?? 0;
+    }
+
+    function money(n) {
+        return `$${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function pillLabelAmount(planKey, pd) {
+        const d = String(planKey).toLowerCase();
+        if (d === 'daily') return { amount: pd, suffix: '/day' };
+        if (d === 'weekly') return { amount: Math.round(7 * pd * (1 - PLAN_DISCOUNTS.WEEKLY / 100) * 100) / 100, suffix: '/week' };
+        if (d === 'monthly') return { amount: Math.round(30 * pd * (1 - PLAN_DISCOUNTS.MONTHLY / 100) * 100) / 100, suffix: '/month' };
+        if (d === 'yearly') return { amount: Math.round(365 * pd * (1 - PLAN_DISCOUNTS.YEARLY / 100) * 100) / 100, suffix: '/year' };
+        return { amount: pd, suffix: '/day' };
+    }
+
+    function updateDurationPills() {
+        document.querySelectorAll('.duration-pill').forEach((pill) => {
+            const type = pill.dataset.type;
+            const { amount, suffix } = pillLabelAmount(type, pricePerDay || 0);
+            const priceEl = pill.querySelector('.pill-price');
+            if (priceEl) priceEl.textContent = `$${amount.toLocaleString()}`;
+            const suf = pill.querySelector('.pill-suffix');
+            if (suf) {
+                const labels = { daily: 'per day', weekly: 'per week', monthly: 'per month', yearly: 'per year' };
+                suf.textContent = labels[type] || 'per day';
+            }
+
+            const save = pill.querySelector('.pill-save');
+            const disc = discountPercent(type);
+            if (save) {
+                if (disc > 0) {
+                    save.classList.remove('hidden');
+                    save.textContent = `SAVE ${disc}%`;
+                } else {
+                    save.classList.add('hidden');
+                }
+            }
+        });
     }
 
     window.selectDuration = function (el) {
         document.querySelectorAll('.duration-pill').forEach((pill) => {
-            pill.classList.remove('active');
+            pill.classList.remove('active', 'border-darkRed', 'bg-darkRed/5');
+            pill.classList.add('border-gray-200');
         });
-        el.classList.add('active');
+        el.classList.add('active', 'border-darkRed', 'bg-darkRed/5');
+        el.classList.remove('border-gray-200');
         selectedDuration = el.dataset.type;
-        selectedPrice = parseInt(el.dataset.price, 10);
+        applyDefaultReturnForPlan(true);
         updateSummary();
     };
 
@@ -114,26 +278,74 @@
         preview.textContent = value || 'MM/YY';
     };
 
+    window.formatCvvDigits = function (input) {
+        input.value = input.value.replace(/\D/g, '').slice(0, 4);
+    };
+
+    function syncDateConstraints() {
+        const pickupEl = document.getElementById('pickupDate');
+        const returnEl = document.getElementById('returnDate');
+        if (!pickupEl || !returnEl) return;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = formatYMDLocal(today);
+        pickupEl.min = todayStr;
+        if (pickupEl.value && pickupEl.value < todayStr) pickupEl.value = todayStr;
+
+        if (pickupEl.value) {
+            const minRet = minReturnYmd(pickupEl.value, selectedDuration);
+            returnEl.min = minRet;
+            if (returnEl.value && returnEl.value < minRet) {
+                returnEl.value = minRet;
+            }
+        } else {
+            returnEl.min = formatYMDLocal(addDaysLocal(today, 1));
+        }
+
+        const pickup = pickupEl.value;
+        const ret = returnEl.value;
+        if (pickup && ret) {
+            const days = rentalDaysBetween(pickup, ret);
+            if (days > MAX_RENTAL_DAYS) {
+                showToast(`Rental cannot exceed ${MAX_RENTAL_DAYS} days (3 years).`, 'error');
+                returnEl.value = formatYMDLocal(addDaysLocal(parseYMD(pickup), MAX_RENTAL_DAYS));
+            }
+        }
+    }
+
     function updateSummary() {
         const durationLabels = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', yearly: 'Yearly' };
-        const rateLabels = { daily: '/day', weekly: '/week', monthly: '/month', yearly: '/year' };
-        const insuranceRates = { daily: 10, weekly: 25, monthly: 80, yearly: 700 };
+        const rateSuffix = { daily: '/day', weekly: '/week', monthly: '/month', yearly: '/year' };
 
-        const subtotal = selectedPrice;
-        const insurance = insuranceRates[selectedDuration];
-        const serviceFee = 15;
-        const tax = (subtotal + insurance + serviceFee) * 0.08;
-        const total = subtotal + insurance + serviceFee + tax;
+        const pickup = document.getElementById('pickupDate').value;
+        const returnVal = document.getElementById('returnDate').value;
+        const days = pickup && returnVal ? rentalDaysBetween(pickup, returnVal) : 0;
 
-        document.getElementById('summaryDuration').textContent = durationLabels[selectedDuration];
-        document.getElementById('summaryRate').textContent = `$${selectedPrice.toLocaleString()}${rateLabels[selectedDuration]}`;
-        document.getElementById('summarySubtotal').textContent = `$${subtotal.toLocaleString()}.00`;
-        document.getElementById('summaryInsurance').textContent = `$${insurance}.00`;
-        document.getElementById('summaryTax').textContent = `$${tax.toFixed(2)}`;
-        document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`;
+        const { amount: pillAmount, suffix: pillSuffix } = pillLabelAmount(selectedDuration, pricePerDay || 0);
+
+        let subtotal = 0;
+        let insurance = 0;
+        let tax = 0;
+        let total = 0;
+        if (days > 0 && pricePerDay > 0) {
+            const b = computePriceFromDates(pickup, returnVal, selectedDuration, pricePerDay);
+            subtotal = b.subtotal;
+            insurance = b.insurance;
+            tax = b.tax;
+            total = b.total;
+        }
+
+        document.getElementById('summaryDuration').textContent = durationLabels[selectedDuration] || 'Weekly';
+        document.getElementById('summaryRate').textContent = `$${pillAmount.toLocaleString()}${pillSuffix}`;
+        document.getElementById('summarySubtotal').textContent = money(subtotal);
+        document.getElementById('summaryInsurance').textContent = money(insurance);
+        const sf = document.getElementById('summaryServiceFee');
+        if (sf) sf.textContent = money(SERVICE_FEE);
+        document.getElementById('summaryTax').textContent = money(tax);
+        document.getElementById('summaryTotal').textContent = money(total);
 
         const durationInfo = document.getElementById('durationInfo');
-        durationInfo.textContent = `Selected: ${durationLabels[selectedDuration]} rental at $${selectedPrice.toLocaleString()}${rateLabels[selectedDuration]}`;
+        durationInfo.textContent = `${durationLabels[selectedDuration]} plan: each full week/month/year at the package discount; days beyond complete periods are billed at the daily rate ($${(pricePerDay || 0).toLocaleString()}/day).`;
 
         const paymentLabel = selectedPaymentMethod === 'cash' ? 'Cash' : 'Visa / Card';
         document.getElementById('summaryPayment').textContent = paymentLabel;
@@ -146,34 +358,79 @@
             depositNote.parentElement.classList.add('hidden');
         }
 
-        const pickup = document.getElementById('pickupDate').value;
-        const returnVal = document.getElementById('returnDate').value;
-        if (pickup && returnVal) {
-            const diff = Math.ceil((new Date(returnVal) - new Date(pickup)) / (1000 * 60 * 60 * 24));
-            if (diff > 0) {
-                let periodText = '';
-                if (selectedDuration === 'daily') periodText = `${diff} day${diff > 1 ? 's' : ''}`;
-                else if (selectedDuration === 'weekly') {
-                    const weeks = Math.ceil(diff / 7);
-                    periodText = `${weeks} week${weeks > 1 ? 's' : ''}`;
-                } else if (selectedDuration === 'monthly') {
-                    const months = Math.ceil(diff / 30);
-                    periodText = `${months} month${months > 1 ? 's' : ''}`;
-                } else {
-                    const years = Math.ceil(diff / 365);
-                    periodText = `${years} year${years > 1 ? 's' : ''}`;
-                }
-                document.getElementById('summaryPeriod').textContent = periodText;
+        if (pickup && returnVal && days > 0) {
+            let periodText = '';
+            if (selectedDuration === 'daily') periodText = `${days} day${days > 1 ? 's' : ''}`;
+            else if (selectedDuration === 'weekly') {
+                const weeks = Math.ceil(days / 7);
+                periodText = `${weeks} week${weeks > 1 ? 's' : ''} (${days} days)`;
+            } else if (selectedDuration === 'monthly') {
+                const months = Math.ceil(days / 30);
+                periodText = `${months} month${months > 1 ? 's' : ''} (${days} days)`;
+            } else {
+                const years = Math.ceil(days / 365);
+                periodText = `${years} year${years > 1 ? 's' : ''} (${days} days)`;
             }
+            document.getElementById('summaryPeriod').textContent = periodText;
+        } else {
+            document.getElementById('summaryPeriod').textContent = '—';
         }
     }
 
-    window.updateSummary = updateSummary;
-    window.handleCheckout = function () {
+    window.updateSummary = function () {
+        syncDateConstraints();
+        updateSummary();
+    };
+
+    function getSessionUser() {
+        try {
+            const raw = localStorage.getItem('driveRedUserSession');
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    window.handleCheckout = async function () {
+        const session = getSessionUser();
+        if (!session || !session.id) {
+            showToast('Please log in to complete your booking.', 'error');
+            setTimeout(() => {
+                window.location.href = 'login.html?next=' + encodeURIComponent(window.location.href);
+            }, 1200);
+            return;
+        }
+
+        if (!loadedVehicle || !loadedVehicle.bookable) {
+            showToast('This vehicle cannot be booked.', 'error');
+            return;
+        }
+
         const idNumber = document.getElementById('idNumber').value.trim();
         const licenseNumber = document.getElementById('licenseNumber').value.trim();
         const licenseExpiry = document.getElementById('licenseExpiry').value;
+        const pickup = document.getElementById('pickupDate').value;
+        const returnVal = document.getElementById('returnDate').value;
 
+        if (!pickup || !returnVal) {
+            showToast('Please select pickup and return dates', 'error');
+            return;
+        }
+        syncDateConstraints();
+        const days = rentalDaysBetween(pickup, returnVal);
+        if (days < 1) {
+            showToast('Return date must be after pickup date', 'error');
+            return;
+        }
+        if (days > MAX_RENTAL_DAYS) {
+            showToast('Maximum rental is 3 years.', 'error');
+            return;
+        }
+        const minR = minReturnYmd(pickup, selectedDuration);
+        if (returnVal < minR) {
+            showToast('Return date must complete at least one full package period for this plan.', 'error');
+            return;
+        }
         if (!idNumber) {
             showToast('Please enter your ID number', 'error');
             return;
@@ -200,24 +457,67 @@
                 showToast('Please enter a valid card number', 'error');
                 return;
             }
+            const cvvEl = document.getElementById('cvvInput');
+            const cvv = (cvvEl?.value || '').replace(/\D/g, '');
+            if (cvv.length < 3 || cvv.length > 4) {
+                showToast('Please enter a valid numeric CVV (3 or 4 digits)', 'error');
+                return;
+            }
         }
 
-        const modal = document.getElementById('successModal');
-        const content = document.getElementById('successContent');
-        document.getElementById('bookingId').textContent = Math.floor(100000 + Math.random() * 900000);
-        document.getElementById('modalPayment').textContent =
-            selectedPaymentMethod === 'cash' ? 'Cash' : 'Visa / Card';
-        document.getElementById('modalTotal').textContent = document.getElementById('summaryTotal').textContent;
+        const planType = String(selectedDuration || 'weekly').toUpperCase();
+        const paymentMethod = selectedPaymentMethod === 'visa' ? 'Visa' : 'Cash';
+        const cardDigits = document.getElementById('cardNumber')?.value.replace(/\D/g, '') || '';
+        const cardLast4 = cardDigits.length >= 4 ? cardDigits.slice(-4) : null;
+        const pickupCity =
+            new URLSearchParams(window.location.search).get('city') ||
+            loadedVehicle.city ||
+            'Cairo';
 
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        setTimeout(() => {
-            content.style.transform = 'scale(1)';
-            content.style.opacity = '1';
-        }, 50);
+        const payload = {
+            userId: session.id,
+            vehicleId: loadedVehicle.id,
+            pickupDate: pickup,
+            returnDate: returnVal,
+            planType,
+            paymentMethod,
+            pickupCity,
+            cardLast4: selectedPaymentMethod === 'visa' ? cardLast4 : null
+        };
 
-        createConfetti();
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        try {
+            const res = await fetch('/api/bookings/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error(t || `Booking failed (${res.status})`);
+            }
+            const booking = await res.json();
+
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('successContent');
+            document.getElementById('bookingId').textContent = String(booking.id);
+            document.getElementById('modalPayment').textContent = booking.paymentMethod || paymentMethod;
+            document.getElementById('modalTotal').textContent = money(booking.totalAmount ?? 0);
+            const mv = document.getElementById('modalVehicleName');
+            if (mv) mv.textContent = `${loadedVehicle.brand} ${loadedVehicle.name}`;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.style.transform = 'scale(1)';
+                content.style.opacity = '1';
+            }, 50);
+
+            createConfetti();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } catch (err) {
+            console.error(err);
+            showToast(String(err.message || err).replace(/^\s*\d{3}\s*/, '').slice(0, 200) || 'Booking failed', 'error');
+        }
     };
 
     window.closeModal = function () {
@@ -228,6 +528,7 @@
         setTimeout(() => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            window.location.href = 'vehicles.html';
         }, 200);
     };
 
@@ -282,22 +583,68 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        let session = null;
+        try {
+            const raw = localStorage.getItem('driveRedUserSession');
+            session = raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            session = null;
+        }
+        if (!session || !session.id) {
+            window.location.replace(`login.html?next=${encodeURIComponent(window.location.href)}`);
+            return;
+        }
+
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        const today = new Date();
-        const pickupDate = new Date(today);
-        pickupDate.setDate(today.getDate() + 1);
-        const returnDate = new Date(today);
-        returnDate.setDate(today.getDate() + 8);
+        const params = new URLSearchParams(window.location.search);
+        const vid = Number(params.get('id'));
+        const qpPickup = params.get('pickup');
+        const qpReturn = params.get('return');
 
+        try {
+            if (vid) {
+                loadedVehicle = await fetchVehicleById(vid);
+                pricePerDay = Number(loadedVehicle.price || 0);
+                if (!loadedVehicle.bookable) {
+                    showToast('This vehicle is not available for online booking.', 'error');
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Could not load vehicle for checkout.', 'error');
+        }
+
+        updateDurationPills();
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const pickupEl = document.getElementById('pickupDate');
         const returnEl = document.getElementById('returnDate');
         if (pickupEl && returnEl) {
-            pickupEl.value = formatDate(pickupDate);
-            returnEl.value = formatDate(returnDate);
-            pickupEl.min = formatDate(today);
+            pickupEl.min = formatYMDLocal(today);
+            returnEl.min = formatYMDLocal(addDaysLocal(today, 1));
+
+            if (qpPickup && qpReturn) {
+                pickupEl.value = qpPickup;
+                returnEl.value = qpReturn;
+            } else {
+                const pickupDate = addDaysLocal(today, 1);
+                pickupEl.value = formatYMDLocal(pickupDate);
+                returnEl.value = formatYMDLocal(firstPackageEndDate(pickupDate, selectedDuration));
+            }
+            pickupEl.addEventListener('change', () => {
+                applyDefaultReturnForPlan(false);
+                window.updateSummary();
+            });
+            returnEl.addEventListener('change', window.updateSummary);
         }
+
+        applyDefaultReturnForPlan(false);
+
+        syncDateConstraints();
+        window.updateSummary();
 
         const uploadArea = document.getElementById('uploadArea');
         if (uploadArea) {
@@ -333,7 +680,5 @@
             { threshold: 0.1 }
         );
         document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-        updateSummary();
     });
 })();

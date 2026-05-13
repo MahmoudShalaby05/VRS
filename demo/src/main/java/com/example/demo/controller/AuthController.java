@@ -1,13 +1,12 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.AppUser;
-import com.example.demo.model.UserBookingHistory;
+import com.example.demo.model.RentalBooking;
 import com.example.demo.model.UserDamageReport;
 import com.example.demo.model.Vehicle;
 import com.example.demo.repository.AppUserRepository;
-import com.example.demo.repository.UserBookingHistoryRepository;
 import com.example.demo.repository.UserDamageReportRepository;
-import com.example.demo.repository.VehicleRepository;
+import com.example.demo.service.BookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,17 +20,14 @@ import java.util.List;
 public class AuthController {
 
     private final AppUserRepository appUserRepository;
-    private final VehicleRepository vehicleRepository;
-    private final UserBookingHistoryRepository userBookingHistoryRepository;
+    private final BookingService bookingService;
     private final UserDamageReportRepository userDamageReportRepository;
 
     public AuthController(AppUserRepository appUserRepository,
-                          VehicleRepository vehicleRepository,
-                          UserBookingHistoryRepository userBookingHistoryRepository,
+                          BookingService bookingService,
                           UserDamageReportRepository userDamageReportRepository) {
         this.appUserRepository = appUserRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.userBookingHistoryRepository = userBookingHistoryRepository;
+        this.bookingService = bookingService;
         this.userDamageReportRepository = userDamageReportRepository;
     }
 
@@ -90,12 +86,12 @@ public class AuthController {
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        List<BookingHistoryResponse> bookings = userBookingHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId)
+        List<BookingHistoryResponse> bookings = bookingService.findForUserProfile(userId)
                 .stream()
                 .map(BookingHistoryResponse::from)
                 .toList();
 
-        List<DamageReportResponse> damageReports = userDamageReportRepository.findByUserIdOrderByCreatedAtDesc(userId)
+        List<DamageReportResponse> damageReports = userDamageReportRepository.findByUserIdForProfile(userId)
                 .stream()
                 .map(DamageReportResponse::from)
                 .toList();
@@ -117,43 +113,51 @@ public class AuthController {
         return AuthUserResponse.from(saved);
     }
 
-    @PostMapping("/profile/{userId}/bookings")
-    @ResponseStatus(HttpStatus.CREATED)
-    public BookingHistoryResponse createBookingHistory(@PathVariable Long userId, @RequestBody CreateBookingRequest request) {
+    @PutMapping("/profile/{userId}")
+    public AuthUserResponse updateProfile(@PathVariable Long userId, @RequestBody UpdateProfileRequest request) {
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        Vehicle vehicle = vehicleRepository.findById(request.vehicleId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
 
-        UserBookingHistory booking = new UserBookingHistory();
-        booking.setUser(user);
-        booking.setVehicle(vehicle);
-        booking.setStartDate(request.startDate());
-        booking.setEndDate(request.endDate());
-        booking.setStatus(request.status() == null || request.status().isBlank() ? "Completed" : request.status());
-        booking.setTotalAmount(request.totalAmount() == null ? 0 : request.totalAmount());
+        String nextEmail = normalizeEmail(request.email());
+        if (request.name() == null || request.name().trim().isEmpty()
+                || nextEmail.isEmpty()
+                || request.phone() == null || request.phone().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name, email and phone are required");
+        }
 
-        return BookingHistoryResponse.from(userBookingHistoryRepository.save(booking));
+        if (!nextEmail.equals(user.getEmail()) && appUserRepository.existsByEmail(nextEmail)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+
+        user.setName(request.name().trim());
+        user.setEmail(nextEmail);
+        user.setPhone(request.phone().trim());
+
+        AppUser saved = appUserRepository.save(user);
+        return AuthUserResponse.from(saved);
     }
 
-    @PostMapping("/profile/{userId}/damage-reports")
-    @ResponseStatus(HttpStatus.CREATED)
-    public DamageReportResponse createDamageReport(@PathVariable Long userId, @RequestBody CreateDamageReportRequest request) {
+    @PutMapping("/profile/{userId}/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(@PathVariable Long userId, @RequestBody UpdatePasswordRequest request) {
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        Vehicle vehicle = vehicleRepository.findById(request.vehicleId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
 
-        UserDamageReport report = new UserDamageReport();
-        report.setUser(user);
-        report.setVehicle(vehicle);
-        report.setDescription(request.description());
-        report.setSeverity(request.severity() == null || request.severity().isBlank() ? "Medium" : request.severity());
-        report.setStatus(request.status() == null || request.status().isBlank() ? "Reported" : request.status());
-        report.setIncidentDate(request.incidentDate());
-        report.setEstimatedCost(request.estimatedCost() == null ? 0 : request.estimatedCost());
+        if (request.currentPassword() == null || request.currentPassword().isBlank()
+                || request.newPassword() == null || request.newPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current and new passwords are required");
+        }
 
-        return DamageReportResponse.from(userDamageReportRepository.save(report));
+        if (!user.getPassword().equals(request.currentPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current password is incorrect");
+        }
+
+        if (request.newPassword().length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must be at least 8 characters");
+        }
+
+        user.setPassword(request.newPassword());
+        appUserRepository.save(user);
     }
 
     private String normalizeEmail(String email) {
@@ -165,10 +169,8 @@ public class AuthController {
     public record LoginRequest(String email, String password) {}
 
     public record ProfilePhotoRequest(String imageUrl) {}
-
-    public record CreateBookingRequest(Long vehicleId, LocalDate startDate, LocalDate endDate, String status, Double totalAmount) {}
-
-    public record CreateDamageReportRequest(Long vehicleId, String description, String severity, String status, LocalDate incidentDate, Double estimatedCost) {}
+    public record UpdateProfileRequest(String name, String email, String phone) {}
+    public record UpdatePasswordRequest(String currentPassword, String newPassword) {}
 
     public record AuthUserResponse(Long id, String name, String email, String phone, String profileImageUrl, LocalDateTime createdAt) {
         static AuthUserResponse from(AppUser user) {
@@ -191,14 +193,15 @@ public class AuthController {
                                          LocalDate endDate,
                                          String status,
                                          Double totalAmount) {
-        static BookingHistoryResponse from(UserBookingHistory booking) {
+        static BookingHistoryResponse from(RentalBooking booking) {
+            Vehicle v = booking.getVehicle();
             return new BookingHistoryResponse(
                     booking.getId(),
-                    booking.getVehicle().getId(),
-                    booking.getVehicle().getName(),
-                    booking.getVehicle().getBrand(),
-                    booking.getStartDate(),
-                    booking.getEndDate(),
+                    v.getId(),
+                    v.getName(),
+                    v.getBrand(),
+                    booking.getPickupDate(),
+                    booking.getReturnDate(),
                     booking.getStatus(),
                     booking.getTotalAmount()
             );
@@ -206,18 +209,26 @@ public class AuthController {
     }
 
     public record DamageReportResponse(Long id,
+                                       Long rentalBookingId,
                                        Long vehicleId,
                                        String vehicleName,
+                                       String vehicleBrand,
+                                       String plateNumber,
                                        String description,
                                        String severity,
                                        String status,
                                        LocalDate incidentDate,
                                        Double estimatedCost) {
         static DamageReportResponse from(UserDamageReport report) {
+            Vehicle v = report.getVehicle();
+            Long rentalId = report.getRentalBooking() != null ? report.getRentalBooking().getId() : null;
             return new DamageReportResponse(
                     report.getId(),
-                    report.getVehicle().getId(),
-                    report.getVehicle().getName(),
+                    rentalId,
+                    v.getId(),
+                    v.getName(),
+                    v.getBrand(),
+                    v.getPlateNumber() != null ? v.getPlateNumber() : "",
                     report.getDescription(),
                     report.getSeverity(),
                     report.getStatus(),

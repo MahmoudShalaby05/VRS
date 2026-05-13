@@ -27,6 +27,7 @@
             <p id="carTypeBadge" class="type-badge mt-4">Luxury</p>
             <h1 id="carName" class="text-5xl font-black text-white mt-4">Car Name</h1>
             <p id="carTagline" class="text-white/80 text-lg max-w-2xl mt-3">Premium ride details</p>
+            <p id="carAvailabilityBanner" class="hidden mt-3 text-sm font-semibold text-amber-200 bg-black/30 inline-block px-3 py-1.5 rounded-lg"></p>
         </div>
     </section>
 
@@ -56,15 +57,15 @@
             <div class="space-y-3">
                 <label class="field-shell">
                     <span>Pickup date</span>
-                    <input type="date">
+                    <input type="date" id="carPickupDate">
                 </label>
                 <label class="field-shell">
                     <span>Return date</span>
-                    <input type="date">
+                    <input type="date" id="carReturnDate">
                 </label>
                 <label class="field-shell">
                     <span>Pickup city</span>
-                    <select>
+                    <select id="carPickupCity">
                         <option>Cairo</option>
                         <option>Alexandria</option>
                         <option>Giza</option>

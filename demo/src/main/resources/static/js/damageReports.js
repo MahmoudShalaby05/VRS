@@ -24,14 +24,127 @@ tailwind.config = {
 }
 
 // ===== STATE =====
+const DAMAGE_API = '/api/damage-reports';
+let currentUserId = null;
+let eligibleRentals = [];
+let selectedBooking = null;
 let currentStep = 1;
 const totalSteps = 3;
 let selectedSeverity = null;
 let selectedLocations = new Set();
 let uploadedPhotos = [];
 
+function getSessionUser() {
+  try {
+    const raw = localStorage.getItem('driveRedUserSession');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+function formatBookingDate(isoDate) {
+  if (!isoDate) return '—';
+  const d = new Date(`${isoDate}T12:00:00`);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function clearVehiclePreview() {
+  selectedBooking = null;
+  document.getElementById('displayPlate').value = '';
+  document.getElementById('displayModel').value = '';
+  document.getElementById('displayRentalId').value = '';
+  document.getElementById('headerRentalId').textContent = '—';
+  document.getElementById('vehiclePreviewTitle').textContent = 'Select a rental to load vehicle details';
+  document.getElementById('vehiclePreviewPlate').textContent = '—';
+  document.getElementById('vehiclePreviewYear').textContent = '—';
+  document.getElementById('vehiclePreviewStatus').textContent = '—';
+  document.getElementById('vehiclePreviewDates').textContent = 'Pickup: — → Return: —';
+  const img = document.getElementById('vehiclePreviewImage');
+  img.classList.add('hidden');
+  img.removeAttribute('src');
+  updateReviewSummary();
+}
+
+function applySelectedRental(r) {
+  selectedBooking = r;
+  document.getElementById('displayPlate').value = r.plateNumber || '—';
+  const modelLine = [r.vehicleBrand, r.vehicleName].filter(Boolean).join(' ');
+  document.getElementById('displayModel').value =
+    modelLine + (r.modelYear != null ? ` · ${r.modelYear}` : '');
+  document.getElementById('displayRentalId').value = `#${r.bookingId}`;
+  document.getElementById('headerRentalId').textContent = `#${r.bookingId}`;
+  document.getElementById('vehiclePreviewTitle').textContent = modelLine || 'Vehicle';
+  document.getElementById('vehiclePreviewPlate').textContent = r.plateNumber || '—';
+  document.getElementById('vehiclePreviewYear').textContent =
+    r.modelYear != null ? String(r.modelYear) : '—';
+  document.getElementById('vehiclePreviewStatus').textContent = r.bookingStatus || '—';
+  document.getElementById('vehiclePreviewDates').textContent =
+    `Pickup: ${formatBookingDate(r.pickupDate)} → Return: ${formatBookingDate(r.returnDate)}`;
+  const img = document.getElementById('vehiclePreviewImage');
+  if (r.imageUrl) {
+    img.src = r.imageUrl;
+    img.alt = modelLine || 'Vehicle';
+    img.classList.remove('hidden');
+  } else {
+    img.classList.add('hidden');
+    img.removeAttribute('src');
+  }
+  updateReviewSummary();
+}
+
+function onRentalBookingChange() {
+  const id = document.getElementById('rentalBookingSelect').value;
+  const r = eligibleRentals.find((x) => String(x.bookingId) === String(id));
+  if (!r) {
+    clearVehiclePreview();
+    return;
+  }
+  applySelectedRental(r);
+}
+
+async function loadEligibleRentals() {
+  const select = document.getElementById('rentalBookingSelect');
+  const hint = document.getElementById('rentalSelectHint');
+  select.innerHTML = '<option value="">Choose the booking this damage applies to…</option>';
+  eligibleRentals = [];
+  try {
+    const res = await fetch(`${DAMAGE_API}/eligible-rentals?userId=${encodeURIComponent(currentUserId)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    eligibleRentals = await res.json();
+  } catch (e) {
+    console.error(e);
+    showToast('Could not load your rentals. Try again later.', 'error');
+    hint.classList.remove('hidden');
+    return;
+  }
+  if (!eligibleRentals.length) {
+    hint.classList.remove('hidden');
+    return;
+  }
+  hint.classList.add('hidden');
+  eligibleRentals.forEach((r) => {
+    const opt = document.createElement('option');
+    opt.value = String(r.bookingId);
+    const label = `${r.vehicleBrand || ''} ${r.vehicleName || 'Vehicle'} · #${r.bookingId} · ${formatBookingDate(r.pickupDate)} – ${formatBookingDate(r.returnDate)}`;
+    opt.textContent = label.trim();
+    select.appendChild(opt);
+  });
+}
+
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const session = getSessionUser();
+  if (!session?.id) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUserId = session.id;
+
+  await loadEligibleRentals();
+  document.getElementById('rentalBookingSelect').addEventListener('change', onRentalBookingChange);
+
   lucide.createIcons();
   updateStepper();
 
@@ -77,6 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
     processFiles(files);
   });
+
+  document.querySelectorAll('.damage-type input').forEach((cb) => {
+    cb.addEventListener('change', updateReviewSummary);
+  });
+
+  updateReviewSummary();
+  renderPhotoGrid();
 });
 
 // ===== STEPPER =====
@@ -177,10 +297,10 @@ function goToStep(step) {
 // ===== VALIDATION =====
 function validateStep(step) {
   if (step === 1) {
-    const mileage = document.getElementById('currentMileage').value;
-    if (!mileage || mileage <= 0) {
-      showToast('Please enter the current mileage.', 'error');
-      document.getElementById('currentMileage').focus();
+    const rentalId = document.getElementById('rentalBookingSelect').value;
+    if (!rentalId) {
+      showToast('Please select the rental this damage is associated with.', 'error');
+      document.getElementById('rentalBookingSelect').focus();
       return false;
     }
     return true;
@@ -373,11 +493,23 @@ function updateReviewSummary() {
   const severityLabels = { minor: '🟢 Minor', moderate: '🟡 Moderate', severe: '🔴 Severe' };
   document.getElementById('reviewSeverity').textContent = selectedSeverity ? severityLabels[selectedSeverity] : 'Not selected';
 
+  const nameEl = document.getElementById('reviewVehicleName');
+  const plateEl = document.getElementById('reviewVehiclePlate');
+  if (selectedBooking) {
+    const modelLine = [selectedBooking.vehicleBrand, selectedBooking.vehicleName].filter(Boolean).join(' ');
+    nameEl.textContent =
+      modelLine + (selectedBooking.modelYear != null ? ` (${selectedBooking.modelYear})` : '');
+    plateEl.textContent = selectedBooking.plateNumber ? `Plate: ${selectedBooking.plateNumber}` : '';
+  } else {
+    nameEl.textContent = '—';
+    plateEl.textContent = '—';
+  }
+
   // Damage types
   const selected = document.querySelectorAll('.damage-type input:checked');
-  const labels = Array.from(selected).map(cb => cb.id.replace('d', ''));
+  const labels = Array.from(selected).map((cb) => cb.id.replace(/^d/, ''));
   document.getElementById('reviewDamageTypes').textContent = labels.length > 0
-    ? labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(', ')
+    ? labels.map((l) => l.charAt(0).toUpperCase() + l.slice(1)).join(', ')
     : 'None selected';
 
   // Photos
@@ -385,18 +517,57 @@ function updateReviewSummary() {
 }
 
 // ===== SUBMIT =====
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
   if (!validateStep(3)) return;
+  if (!selectedBooking) {
+    showToast('Please select a rental in step 1.', 'error');
+    return;
+  }
 
-  // Generate report reference
-  const ref = `DMG-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999)).padStart(4, '0')}`;
-  document.getElementById('reportRef').textContent = ref;
+  const damageTypes = Array.from(document.querySelectorAll('.damage-type input:checked')).map((cb) =>
+    cb.id.replace(/^d/, '')
+  );
+  const bodyLocations = Array.from(selectedLocations);
+  const photos = uploadedPhotos.map((p) => p.data);
 
-  // Show success modal
-  const modal = document.getElementById('successModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  const payload = {
+    userId: currentUserId,
+    rentalBookingId: selectedBooking.bookingId,
+    description: document.getElementById('damageDescription').value.trim(),
+    severity: selectedSeverity,
+    incidentDate: document.getElementById('incidentDate').value,
+    incidentTime: document.getElementById('incidentTime').value || null,
+    incidentLocation: document.getElementById('incidentLocation').value.trim(),
+    damageTypes,
+    bodyLocations,
+    photos,
+    estimatedCost: 0
+  };
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  try {
+    const res = await fetch(DAMAGE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const msg = await res.text();
+      throw new Error(msg || `Request failed (${res.status})`);
+    }
+    const data = await res.json();
+    document.getElementById('reportRef').textContent = `DMG-${data.id}`;
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  } catch (e) {
+    console.error(e);
+    showToast(String(e.message || e).slice(0, 220), 'error');
+  } finally {
+    submitBtn.disabled = false;
+  }
 }
 
 function closeModal() {

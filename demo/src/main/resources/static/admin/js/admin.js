@@ -3,24 +3,8 @@
 // ===========================
 const store = {
     vehicles: [],
-    bookings: [
-        { id: 'BK-001', customer: 'Alice Johnson', vehicleId: 'VH-002', startDate: '2025-01-10', endDate: '2025-01-15', status: 'Confirmed', amount: 475 },
-        { id: 'BK-002', customer: 'Bob Williams', vehicleId: 'VH-005', startDate: '2025-01-12', endDate: '2025-01-18', status: 'Confirmed', amount: 1200 },
-        { id: 'BK-003', customer: 'Carol Davis', vehicleId: 'VH-008', startDate: '2025-01-08', endDate: '2025-01-12', status: 'Completed', amount: 360 },
-        { id: 'BK-004', customer: 'David Brown', vehicleId: 'VH-001', startDate: '2025-01-20', endDate: '2025-01-25', status: 'Pending', amount: 375 },
-        { id: 'BK-005', customer: 'Eva Martinez', vehicleId: 'VH-003', startDate: '2025-01-05', endDate: '2025-01-07', status: 'Completed', amount: 220 },
-        { id: 'BK-006', customer: 'Frank Wilson', vehicleId: 'VH-007', startDate: '2025-01-22', endDate: '2025-01-26', status: 'Pending', amount: 740 },
-        { id: 'BK-007', customer: 'Grace Lee', vehicleId: 'VH-002', startDate: '2025-01-18', endDate: '2025-01-20', status: 'Pending', amount: 190 },
-        { id: 'BK-008', customer: 'Henry Taylor', vehicleId: 'VH-001', startDate: '2024-12-28', endDate: '2025-01-02', status: 'Cancelled', amount: 375 },
-    ],
-    damages: [
-        { id: 'DM-001', vehicleId: 'VH-003', description: 'Large dent on driver side door from parking lot impact', severity: 'Medium', status: 'Under Review', date: '2025-01-08', cost: 800, photo: null },
-        { id: 'DM-002', vehicleId: 'VH-004', description: 'Engine overheating - possible radiator leak', severity: 'High', status: 'Repairing', date: '2025-01-06', cost: 1500, photo: null },
-        { id: 'DM-003', vehicleId: 'VH-001', description: 'Minor scratch on rear bumper', severity: 'Low', status: 'Resolved', date: '2025-01-03', cost: 150, photo: null },
-        { id: 'DM-004', vehicleId: 'VH-005', description: 'Windshield crack from road debris - obstructs view', severity: 'Critical', status: 'Reported', date: '2025-01-10', cost: 1200, photo: null },
-        { id: 'DM-005', vehicleId: 'VH-002', description: 'Passenger side mirror broken off', severity: 'Medium', status: 'Reported', date: '2025-01-09', cost: 350, photo: null },
-        { id: 'DM-006', vehicleId: 'VH-008', description: 'Rear tire tread worn below safety limit', severity: 'High', status: 'Repairing', date: '2025-01-07', cost: 600, photo: null },
-    ],
+    bookings: [],
+    damages: [],
     users: [
         { id: 'USR-001', firstName: 'John', lastName: 'Carter', email: 'john.carter@autoadmin.com', phone: '+1 (555) 234-5678', role: 'Super Admin', status: 'Active', joined: '2022-03-15', avatar: null },
         { id: 'USR-002', firstName: 'Sarah', lastName: 'Mitchell', email: 'sarah.mitchell@autoadmin.com', phone: '+1 (555) 987-6543', role: 'Admin', status: 'Active', joined: '2022-06-01', avatar: null },
@@ -44,8 +28,6 @@ const store = {
 // ID COUNTERS
 // ===========================
 let vehicleCounter = 1;
-let bookingCounter = 9;
-let damageCounter = 7;
 let userCounter = 7;
 
 // ===========================
@@ -53,6 +35,8 @@ let userCounter = 7;
 // ===========================
 const VEHICLE_API_URL = '/api/vehicles';
 const AUTH_USERS_API_URL = '/api/auth/users';
+const BOOKINGS_API_URL = '/api/bookings';
+const DAMAGE_API_URL = '/api/damage-reports';
 
 function mapVehicleFromApi(vehicle) {
     const status = vehicle.availabilityStatus || 'Available';
@@ -115,6 +99,7 @@ function mapUserFromApi(user) {
     const joined = user.createdAt ? String(user.createdAt).split('T')[0] : new Date().toISOString().split('T')[0];
 
     return {
+        numericId: user.id,
         id: `USR-${user.id}`,
         firstName,
         lastName,
@@ -134,6 +119,56 @@ async function loadUsersFromDb() {
     }
     const data = await response.json();
     store.users = data.map(mapUserFromApi);
+}
+
+function mapBookingFromApi(b) {
+    return {
+        id: b.id,
+        customer: b.guestName || '—',
+        guestEmail: b.guestEmail,
+        userId: b.userId,
+        vehicleId: b.vehicleId,
+        startDate: b.pickupDate,
+        endDate: b.returnDate,
+        planType: b.planType || 'DAILY',
+        paymentMethod: b.paymentMethod || 'Cash',
+        status: b.status,
+        amount: Number(b.totalAmount || 0)
+    };
+}
+
+async function loadBookingsFromDb() {
+    const response = await fetch(BOOKINGS_API_URL);
+    if (!response.ok) {
+        throw new Error(`Failed to load bookings (${response.status})`);
+    }
+    const data = await response.json();
+    store.bookings = data.map(mapBookingFromApi);
+}
+
+function mapDamageFromApi(row) {
+    return {
+        id: row.id,
+        userId: row.userId,
+        userName: row.userName || '—',
+        vehicleId: String(row.vehicleId),
+        vehicleLabel: `${row.vehicleBrand || ''} ${row.vehicleName || ''}`.trim() || String(row.vehicleId),
+        description: row.description || '',
+        severity: row.severity,
+        status: row.status,
+        date: row.incidentDate,
+        cost: row.estimatedCost != null ? Number(row.estimatedCost) : 0,
+        photo: row.photo || null
+    };
+}
+
+async function loadDamagesFromDb() {
+    const response = await fetch(DAMAGE_API_URL);
+    if (!response.ok) {
+        throw new Error(`Failed to load damage reports (${response.status})`);
+    }
+    const data = await response.json();
+    store.damages = data.map(mapDamageFromApi);
 }
 
 // ===========================
@@ -215,11 +250,11 @@ function handleGlobalSearch(query) {
         v.plate.toLowerCase().includes(query)
     );
     const bookingMatch = store.bookings.find(b =>
-        b.id.toLowerCase().includes(query) ||
+        String(b.id).toLowerCase().includes(query) ||
         b.customer.toLowerCase().includes(query)
     );
     const damageMatch = store.damages.find(d =>
-        d.id.toLowerCase().includes(query) ||
+        String(d.id).toLowerCase().includes(query) ||
         d.description.toLowerCase().includes(query)
     );
     const userMatch = store.users.find(u =>
@@ -294,7 +329,7 @@ function refreshDashboard() {
     const recentBody = document.getElementById('dashRecentBookings');
     const recentBookings = [...store.bookings].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).slice(0, 5);
     recentBody.innerHTML = recentBookings.map(b => {
-        const vehicle = store.vehicles.find(v => v.id === b.vehicleId);
+        const vehicle = store.vehicles.find(v => String(v.id) === String(b.vehicleId));
         const vehicleLabel = vehicle ? `${vehicle.make} ${vehicle.model}` : b.vehicleId;
         return `
             <tr class="border-b border-dark-500/50">
@@ -684,7 +719,7 @@ function renderBookings() {
     }
 
     tbody.innerHTML = filtered.map(b => {
-        const vehicle = store.vehicles.find(v => v.id === b.vehicleId);
+        const vehicle = store.vehicles.find(v => String(v.id) === String(b.vehicleId));
         const vehicleLabel = vehicle ? `${vehicle.make} ${vehicle.model}` : b.vehicleId;
         const statusClass = {
             'Pending': 'badge-pending',
@@ -701,13 +736,13 @@ function renderBookings() {
                 <td class="px-5 py-3 text-sm text-gray-300">${vehicleLabel}</td>
                 <td class="px-5 py-3 text-sm text-gray-400">${dateRange}</td>
                 <td class="px-5 py-3"><span class="${statusClass} text-xs px-2.5 py-1 rounded-full font-medium">${b.status}</span></td>
-                <td class="px-5 py-3 text-sm text-white font-medium">$${b.amount.toLocaleString()}</td>
+                <td class="px-5 py-3 text-sm text-white font-medium">$${Number(b.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-1">
-                        <button onclick="editBooking('${b.id}')" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors" title="Edit">
+                        <button onclick="editBooking(${b.id})" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors" title="Edit">
                             <i data-lucide="edit-3" class="w-4 h-4 text-gray-400"></i>
                         </button>
-                        <button onclick="deleteItem('booking', '${b.id}')" class="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors" title="Delete">
+                        <button onclick="deleteItem('booking', ${b.id})" class="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors" title="Delete">
                             <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
                         </button>
                     </div>
@@ -736,17 +771,37 @@ function openBookingModal(editId = null) {
         vehicleSelect.appendChild(opt);
     });
 
-    if (editId) {
-        const booking = store.bookings.find(b => b.id === editId);
+    const linkSel = document.getElementById('bookingLinkedUser');
+    if (linkSel) {
+        linkSel.innerHTML = '<option value="">Guest only (no app account)</option>';
+        store.users.forEach(u => {
+            if (u.numericId != null) {
+                const opt = document.createElement('option');
+                opt.value = String(u.numericId);
+                opt.textContent = `${u.firstName} ${u.lastName} (${u.email})`;
+                linkSel.appendChild(opt);
+            }
+        });
+    }
+
+    if (editId !== null && editId !== undefined && editId !== '') {
+        const booking = store.bookings.find(b => String(b.id) === String(editId));
         if (!booking) return;
         title.textContent = 'Edit Booking';
         document.getElementById('bookingEditId').value = booking.id;
         document.getElementById('bookingCustomer').value = booking.customer;
-        document.getElementById('bookingVehicle').value = booking.vehicleId;
+        const ge = document.getElementById('bookingGuestEmail');
+        if (ge) ge.value = booking.guestEmail || '';
+        if (linkSel) linkSel.value = booking.userId ? String(booking.userId) : '';
+        document.getElementById('bookingVehicle').value = String(booking.vehicleId);
         document.getElementById('bookingStart').value = booking.startDate;
         document.getElementById('bookingEnd').value = booking.endDate;
         document.getElementById('bookingStatus').value = booking.status;
-        document.getElementById('bookingAmount').value = booking.amount;
+        const pt = document.getElementById('bookingPlanType');
+        if (pt) pt.value = booking.planType || 'WEEKLY';
+        const pm = document.getElementById('bookingPayment');
+        if (pm) pm.value = booking.paymentMethod || 'Cash';
+        document.getElementById('bookingAmount').value = Number(booking.amount || 0).toFixed(2);
     } else {
         title.textContent = 'New Booking';
         const today = new Date().toISOString().split('T')[0];
@@ -754,8 +809,13 @@ function openBookingModal(editId = null) {
         const end = new Date();
         end.setDate(end.getDate() + 3);
         document.getElementById('bookingEnd').value = end.toISOString().split('T')[0];
+        const pt = document.getElementById('bookingPlanType');
+        if (pt) pt.value = 'WEEKLY';
+        const pm = document.getElementById('bookingPayment');
+        if (pm) pm.value = 'Cash';
     }
 
+    autoCalcBookingAmount();
     modal.classList.remove('hidden');
 }
 
@@ -767,18 +827,21 @@ function editBooking(id) {
     openBookingModal(id);
 }
 
-function saveBooking(e) {
+async function saveBooking(e) {
     e.preventDefault();
 
     const editId = document.getElementById('bookingEditId').value;
     const customer = document.getElementById('bookingCustomer').value.trim();
+    const guestEmail = document.getElementById('bookingGuestEmail')?.value?.trim() || '';
+    const linkedRaw = document.getElementById('bookingLinkedUser')?.value || '';
     const vehicleId = document.getElementById('bookingVehicle').value;
     const startDate = document.getElementById('bookingStart').value;
     const endDate = document.getElementById('bookingEnd').value;
     const status = document.getElementById('bookingStatus').value;
-    const amount = parseInt(document.getElementById('bookingAmount').value);
+    const planType = document.getElementById('bookingPlanType')?.value || 'DAILY';
+    const paymentMethod = document.getElementById('bookingPayment')?.value || 'Cash';
 
-    if (!customer || !vehicleId || !startDate || !endDate || !status || !amount) {
+    if (!customer || !vehicleId || !startDate || !endDate || !status) {
         showToast('Please fill all required fields', 'error');
         return;
     }
@@ -787,21 +850,54 @@ function saveBooking(e) {
         return;
     }
 
-    if (editId) {
-        const idx = store.bookings.findIndex(b => b.id === editId);
-        if (idx !== -1) {
-            store.bookings[idx] = { ...store.bookings[idx], customer, vehicleId, startDate, endDate, status, amount };
-            showToast(`Booking ${editId} updated successfully`, 'success');
-        }
-    } else {
-        const newId = `BK-${String(bookingCounter++).padStart(3, '0')}`;
-        store.bookings.push({ id: newId, customer, vehicleId, startDate, endDate, status, amount });
-        showToast(`Booking ${newId} created successfully`, 'success');
-    }
+    const payload = {
+        userId: linkedRaw ? Number(linkedRaw) : null,
+        guestName: customer,
+        guestEmail: guestEmail || null,
+        vehicleId: Number(vehicleId),
+        pickupDate: startDate,
+        returnDate: endDate,
+        planType,
+        paymentMethod,
+        status
+    };
 
-    closeBookingModal();
-    renderBookings();
-    refreshDashboard();
+    try {
+        if (editId) {
+            const response = await fetch(`${BOOKINGS_API_URL}/${editId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Update failed (${response.status})`);
+            }
+            showToast(`Booking #${editId} updated`, 'success');
+        } else {
+            const response = await fetch(BOOKINGS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Create failed (${response.status})`);
+            }
+            const created = await response.json();
+            showToast(`Booking #${created.id} created`, 'success');
+        }
+
+        await loadBookingsFromDb();
+        await loadVehiclesFromDb();
+        closeBookingModal();
+        renderBookings();
+        renderVehicles();
+        refreshDashboard();
+    } catch (error) {
+        console.error(error);
+        showToast(String(error.message || error).slice(0, 220), 'error');
+    }
 }
 
 // ===========================
@@ -862,10 +958,10 @@ function renderDamages() {
                 <td class="px-5 py-3 text-sm text-gray-400">${formatDate(d.date)}</td>
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-1">
-                        <button onclick="editDamage('${d.id}')" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors" title="Edit">
+                        <button onclick="editDamage(${d.id})" class="p-1.5 hover:bg-dark-500 rounded-lg transition-colors" title="Edit">
                             <i data-lucide="edit-3" class="w-4 h-4 text-gray-400"></i>
                         </button>
-                        <button onclick="deleteItem('damage', '${d.id}')" class="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors" title="Delete">
+                        <button onclick="deleteItem('damage', ${d.id})" class="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors" title="Delete">
                             <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
                         </button>
                     </div>
@@ -895,12 +991,24 @@ function openDamageModal(editId = null) {
         vehicleSelect.appendChild(opt);
     });
 
+    const reporterSelect = document.getElementById('damageReporterUser');
+    reporterSelect.innerHTML = '<option value="">Select customer</option>';
+    store.users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = String(u.numericId);
+        opt.textContent = `${u.firstName} ${u.lastName} (${u.email})`;
+        reporterSelect.appendChild(opt);
+    });
+
     if (editId) {
-        const damage = store.damages.find(d => d.id === editId);
+        const damage = store.damages.find(d => String(d.id) === String(editId));
         if (!damage) return;
         title.textContent = 'Edit Damage Report';
-        document.getElementById('damageEditId').value = damage.id;
+        document.getElementById('damageEditId').value = String(damage.id);
         document.getElementById('damageVehicle').value = damage.vehicleId;
+        if (damage.userId != null) {
+            document.getElementById('damageReporterUser').value = String(damage.userId);
+        }
         document.getElementById('damageDescription').value = damage.description;
         document.getElementById('damageSeverity').value = damage.severity;
         document.getElementById('damageStatus').value = damage.status;
@@ -933,38 +1041,78 @@ function editDamage(id) {
     openDamageModal(id);
 }
 
-function saveDamage(e) {
+async function saveDamage(e) {
     e.preventDefault();
 
     const editId = document.getElementById('damageEditId').value;
     const vehicleId = document.getElementById('damageVehicle').value;
+    const userIdRaw = document.getElementById('damageReporterUser').value;
     const description = document.getElementById('damageDescription').value.trim();
     const severity = document.getElementById('damageSeverity').value;
     const status = document.getElementById('damageStatus').value;
-    const cost = parseInt(document.getElementById('damageCost').value) || 0;
-    const photo = document.getElementById('damagePhotoInput').dataset.preview || null;
+    const cost = parseInt(document.getElementById('damageCost').value, 10) || 0;
+    const photo = document.getElementById('damagePhotoInput').dataset.preview || '';
 
-    if (!vehicleId || !description || !severity || !status) {
+    if (!userIdRaw || !vehicleId || !description || !severity || !status) {
         showToast('Please fill all required fields', 'error');
         return;
     }
 
+    let incidentDate = new Date().toISOString().split('T')[0];
     if (editId) {
-        const idx = store.damages.findIndex(d => d.id === editId);
-        if (idx !== -1) {
-            store.damages[idx] = { ...store.damages[idx], vehicleId, description, severity, status, cost, photo: photo || store.damages[idx].photo };
-            showToast(`Report ${editId} updated successfully`, 'success');
+        const existing = store.damages.find(d => String(d.id) === String(editId));
+        if (existing?.date) {
+            incidentDate = existing.date;
         }
-    } else {
-        const newId = `DM-${String(damageCounter++).padStart(3, '0')}`;
-        const today = new Date().toISOString().split('T')[0];
-        store.damages.push({ id: newId, vehicleId, description, severity, status, date: today, cost, photo });
-        showToast(`Damage report ${newId} created successfully`, 'success');
     }
 
-    closeDamageModal();
-    renderDamages();
-    refreshDashboard();
+    const payload = {
+        userId: Number(userIdRaw),
+        vehicleId: Number(vehicleId),
+        description,
+        severity,
+        status,
+        incidentDate,
+        estimatedCost: cost
+    };
+    if (photo) {
+        payload.photo = photo;
+    }
+
+    try {
+        if (editId) {
+            const response = await fetch(`${DAMAGE_API_URL}/${editId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Update failed (${response.status})`);
+            }
+            showToast(`Report #${editId} updated`, 'success');
+        } else {
+            const response = await fetch(`${DAMAGE_API_URL}/admin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `Create failed (${response.status})`);
+            }
+            const created = await response.json();
+            showToast(`Damage report #${created.id} created`, 'success');
+        }
+
+        await loadDamagesFromDb();
+        closeDamageModal();
+        renderDamages();
+        refreshDashboard();
+    } catch (error) {
+        console.error(error);
+        showToast(String(error.message || error).slice(0, 220), 'error');
+    }
 }
 
 // ===========================
@@ -1171,11 +1319,33 @@ async function confirmDelete() {
             renderVehicles();
             break;
         case 'booking':
-            store.bookings = store.bookings.filter(b => b.id !== id);
+            try {
+                const response = await fetch(`${BOOKINGS_API_URL}/${id}`, { method: 'DELETE' });
+                if (!response.ok && response.status !== 204) {
+                    throw new Error(`Delete failed (${response.status})`);
+                }
+                await loadBookingsFromDb();
+                await loadVehiclesFromDb();
+            } catch (error) {
+                console.error(error);
+                showToast('Could not delete booking', 'error');
+                return;
+            }
             renderBookings();
+            renderVehicles();
             break;
         case 'damage':
-            store.damages = store.damages.filter(d => d.id !== id);
+            try {
+                const response = await fetch(`${DAMAGE_API_URL}/${id}`, { method: 'DELETE' });
+                if (!response.ok && response.status !== 204) {
+                    throw new Error(`Delete failed (${response.status})`);
+                }
+                await loadDamagesFromDb();
+            } catch (error) {
+                console.error(error);
+                showToast('Could not delete damage report', 'error');
+                return;
+            }
             renderDamages();
             break;
         case 'user':
@@ -1245,10 +1415,65 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ===========================
-// AUTO-CALCULATE BOOKING AMOUNT
+// AUTO-CALCULATE BOOKING AMOUNT (matches server: package segments + daily tail)
 // ===========================
+function adminAddCalendarMonths(date, months) {
+    const d = new Date(date.getTime());
+    const day = d.getDate();
+    d.setMonth(d.getMonth() + months);
+    if (d.getDate() < day) d.setDate(0);
+    return d;
+}
+
+function adminAddOneYear(date) {
+    const d = new Date(date.getTime());
+    d.setFullYear(d.getFullYear() + 1);
+    return d;
+}
+
+function adminComputeSubtotal(startDate, endDate, planType, pd) {
+    const start = new Date(startDate + 'T00:00:00');
+    const end = new Date(endDate + 'T00:00:00');
+    const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
+    if (days < 1 || pd <= 0) return 0;
+    const planU = String(planType || 'DAILY').toUpperCase();
+    if (planU === 'DAILY') return Math.round(days * pd * 100) / 100;
+    const discMap = { DAILY: 0, WEEKLY: 11, MONTHLY: 27, YEARLY: 42 };
+    const disc = (discMap[planU] ?? 0) / 100;
+    let pos = new Date(start.getTime());
+    let sub = 0;
+    while (pos < end) {
+        let boundary;
+        if (planU === 'WEEKLY') {
+            boundary = new Date(pos.getTime());
+            boundary.setDate(boundary.getDate() + 7);
+        } else if (planU === 'MONTHLY') {
+            boundary = adminAddCalendarMonths(pos, 1);
+        } else if (planU === 'YEARLY') {
+            boundary = adminAddOneYear(pos);
+        } else {
+            boundary = new Date(pos.getTime());
+            boundary.setDate(boundary.getDate() + 1);
+        }
+        const segEnd = boundary < end ? boundary : end;
+        const ddays = Math.round((segEnd - pos) / (1000 * 60 * 60 * 24));
+        if (ddays <= 0) break;
+        const fullSeg = segEnd.getTime() === boundary.getTime();
+        if (fullSeg) sub += ddays * pd * (1 - disc);
+        else sub += ddays * pd;
+        pos = segEnd;
+    }
+    return Math.round(sub * 100) / 100;
+}
+
 document.addEventListener('change', (e) => {
-    if (e.target.id === 'bookingStart' || e.target.id === 'bookingEnd' || e.target.id === 'bookingVehicle') {
+    if (
+        e.target.id === 'bookingStart' ||
+        e.target.id === 'bookingEnd' ||
+        e.target.id === 'bookingVehicle' ||
+        e.target.id === 'bookingPlanType' ||
+        e.target.id === 'bookingPayment'
+    ) {
         autoCalcBookingAmount();
     }
 });
@@ -1257,15 +1482,22 @@ function autoCalcBookingAmount() {
     const vehicleId = document.getElementById('bookingVehicle').value;
     const startDate = document.getElementById('bookingStart').value;
     const endDate = document.getElementById('bookingEnd').value;
+    const planType = document.getElementById('bookingPlanType')?.value || 'DAILY';
 
     if (vehicleId && startDate && endDate) {
-        const vehicle = store.vehicles.find(v => v.id === vehicleId);
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const vehicle = store.vehicles.find(v => String(v.id) === String(vehicleId));
+        const start = new Date(startDate + 'T00:00:00');
+        const end = new Date(endDate + 'T00:00:00');
+        const days = Math.round((end - start) / (1000 * 60 * 60 * 24));
 
         if (vehicle && days > 0) {
-            document.getElementById('bookingAmount').value = vehicle.rate * days;
+            const pd = Number(vehicle.rate || 0);
+            const subtotal = adminComputeSubtotal(startDate, endDate, planType, pd);
+            const insurance = Math.round(Math.min(10 * days, 700) * 100) / 100;
+            const serviceFee = 15;
+            const tax = Math.round((subtotal + insurance + serviceFee) * 0.08 * 100) / 100;
+            const total = Math.round((subtotal + insurance + serviceFee + tax) * 100) / 100;
+            document.getElementById('bookingAmount').value = total.toFixed(2);
         }
     }
 }
@@ -1286,6 +1518,18 @@ async function init() {
     } catch (error) {
         console.error(error);
         showToast('Failed to load users from database', 'error');
+    }
+    try {
+        await loadBookingsFromDb();
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to load bookings from database', 'error');
+    }
+    try {
+        await loadDamagesFromDb();
+    } catch (error) {
+        console.error(error);
+        showToast('Failed to load damage reports from database', 'error');
     }
     refreshDashboard();
     renderVehicles();

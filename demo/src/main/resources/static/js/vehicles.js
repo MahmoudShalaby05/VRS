@@ -153,13 +153,23 @@ function renderCars(list) {
     carsGrid.innerHTML = pagedCars
         .map((car) => {
             const compared = compareList.has(car.id);
+            const unavailable = !car.bookable;
+            const statusLower = (car.availabilityStatus || "").toLowerCase();
+            const badgeClass =
+                statusLower === "maintenance" ? "availability-badge maintenance" : "availability-badge booked";
+            const badgeLabel =
+                statusLower === "maintenance" ? "Maintenance" : statusLower === "booked" ? "Booked" : "Unavailable";
+            const badgeHtml = unavailable
+                ? `<span class="${badgeClass}">${badgeLabel}</span>`
+                : "";
             return `
-            <article class="car-card">
+            <article class="car-card${unavailable ? " is-unavailable" : ""}">
                 <div class="car-media relative">
                     <img src="${car.img}" alt="${car.name}" class="car-thumb">
                     <div class="tag-row">
                         <span class="tag red">${car.badges[0]}</span>
                         <span class="tag light">${car.match}% match</span>
+                        ${badgeHtml}
                     </div>
                 </div>
                 <div class="car-main">
@@ -173,7 +183,6 @@ function renderCars(list) {
                         <li><span>Fuel</span><strong>${car.fuel}</strong></li>
                         <li><span>Luggage</span><strong>${car.luggage}</strong></li>
                         <li><span>Engine</span><strong>${car.engine}</strong></li>
-                        <li><span>Daily KM</span><strong>${car.dailyKm} km</strong></li>
                     </ul>
                 </div>
                 <div class="car-actions-panel">
@@ -253,7 +262,6 @@ function openCompareModal() {
                             <li><span>Fuel</span><strong>${car.fuel}</strong></li>
                             <li><span>Engine</span><strong>${car.engine}</strong></li>
                             <li><span>City</span><strong>${car.city}</strong></li>
-                            <li><span>Daily allowance</span><strong>${car.dailyKm} km</strong></li>
                             <li><span>Rating</span><strong>${car.rating}/5</strong></li>
                             <li><span>Luggage</span><strong>${car.luggage}</strong></li>
                         </ul>

@@ -35,6 +35,10 @@ function mapVehicleFromApi(vehicle) {
         ? "Sports"
         : (vehicle.badge || "Popular");
 
+    const availabilityRaw = (vehicle.availabilityStatus || "Available").trim();
+    const availabilityLower = availabilityRaw.toLowerCase();
+    const bookable = availabilityLower !== "maintenance" && availabilityLower !== "booked";
+
     return {
         id: vehicle.id,
         name: vehicle.name,
@@ -54,6 +58,8 @@ function mapVehicleFromApi(vehicle) {
         match: vehicle.matchScore ?? 90,
         badges: [primaryBadge],
         img: vehicle.imageUrl || "http://static.photos/automotive/640x360/1",
-        description: vehicle.description || "Vehicle details are available."
+        description: vehicle.description || "Vehicle details are available.",
+        availabilityStatus: availabilityRaw,
+        bookable
     };
 }

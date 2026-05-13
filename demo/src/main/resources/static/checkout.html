@@ -103,24 +103,24 @@
                         <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="daily" data-price="45" onclick="selectDuration(this)">
                             <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Daily</p>
                             <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$45</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">per day</p>
+                            <p class="pill-suffix text-[11px] text-gray-400 mt-0.5">per day</p>
                         </div>
                         <div class="duration-pill active rounded-xl border-2 border-transparent p-3 text-center" data-type="weekly" data-price="280" onclick="selectDuration(this)">
                             <p class="pill-label text-xs font-medium uppercase tracking-wider">Weekly</p>
                             <p class="pill-price text-2xl font-extrabold mt-1">$280</p>
-                            <p class="text-[11px] mt-0.5 opacity-80">per week</p>
+                            <p class="pill-suffix text-[11px] mt-0.5 opacity-80">per week</p>
                             <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 11%</span>
                         </div>
                         <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="monthly" data-price="980" onclick="selectDuration(this)">
                             <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Monthly</p>
                             <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$980</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">per month</p>
+                            <p class="pill-suffix text-[11px] text-gray-400 mt-0.5">per month</p>
                             <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 27%</span>
                         </div>
                         <div class="duration-pill rounded-xl border-2 border-gray-200 p-3 text-center" data-type="yearly" data-price="9500" onclick="selectDuration(this)">
                             <p class="pill-label text-xs font-medium text-gray-400 uppercase tracking-wider">Yearly</p>
                             <p class="pill-price text-2xl font-extrabold text-gray-900 mt-1">$9,500</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">per year</p>
+                            <p class="pill-suffix text-[11px] text-gray-400 mt-0.5">per year</p>
                             <span class="pill-save inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-darkRed/10 text-darkRed">SAVE 42%</span>
                         </div>
                     </div>
@@ -323,7 +323,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">CVV</label>
                                 <div class="relative">
-                                    <input type="password" placeholder="•••" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="4">
+                                    <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="•••" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm outline-none" maxlength="4" id="cvvInput" oninput="formatCvvDigits(this)">
                                     <i data-lucide="help-circle" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-help"></i>
                                 </div>
                             </div>
@@ -433,7 +433,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-500">Service Fee</span>
-                                    <span class="text-sm font-medium text-gray-700">$15.00</span>
+                                    <span class="text-sm font-medium text-gray-700" id="summaryServiceFee">$15.00</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-500">Tax (8%)</span>
@@ -521,7 +521,7 @@
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500">Vehicle</span>
-                    <span class="font-semibold text-gray-900">Toyota Camry</span>
+                    <span class="font-semibold text-gray-900" id="modalVehicleName">—</span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500">Payment</span>
@@ -545,6 +545,7 @@
     <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-3"></div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/vehicles-api.js"></script>
     <script src="js/checkout.js"></script>
 </body>
 </html>

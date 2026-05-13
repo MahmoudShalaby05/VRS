@@ -134,6 +134,14 @@
     color: #fff;
 }
 
+.book-btn.is-disabled,
+a.book-btn.is-disabled {
+    background: #9ca3af;
+    color: #f3f4f6;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
 a.book-btn {
     text-decoration: none;
 }

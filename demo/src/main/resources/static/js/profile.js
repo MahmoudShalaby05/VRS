@@ -47,9 +47,9 @@ function renderProfile(profile) {
     } else {
         damageContainer.innerHTML = profile.damageReports.map((d) => `
             <div class="history-item">
-                <p class="history-title">${d.vehicleName} • ${d.severity}</p>
+                <p class="history-title">${d.vehicleBrand ? d.vehicleBrand + ' ' : ''}${d.vehicleName} • ${d.severity}</p>
                 <p class="history-sub">${d.description || '-'}</p>
-                <p class="history-sub">${formatDate(d.incidentDate)} • ${d.status} • Cost: $${d.estimatedCost ?? 0}</p>
+                <p class="history-sub">${formatDate(d.incidentDate)} • ${d.status} • Cost: $${d.estimatedCost ?? 0}${d.rentalBookingId != null ? ` • Rental #${d.rentalBookingId}` : ''}${d.plateNumber ? ` • ${d.plateNumber}` : ''}</p>
             </div>
         `).join('');
     }
@@ -73,6 +73,31 @@ async function uploadProfilePhoto(userId, imageUrl) {
         throw new Error(`Failed to upload profile photo (${response.status})`);
     }
     return response.json();
+}
+
+async function updateProfileInfo(userId, payload) {
+    const response = await fetch(`${PROFILE_API_BASE}/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Failed to update profile (${response.status})`);
+    }
+    return response.json();
+}
+
+async function updatePassword(userId, payload) {
+    const response = await fetch(`${PROFILE_API_BASE}/${userId}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Failed to update password (${response.status})`);
+    }
 }
 
 function wirePhotoUpload(userId) {
@@ -101,6 +126,112 @@ function wirePhotoUpload(userId) {
     });
 }
 
+function openEditModal(user) {
+    document.getElementById('editName').value = user.name || '';
+    document.getElementById('editEmail').value = user.email || '';
+    document.getElementById('editPhone').value = user.phone || '';
+    document.getElementById('editProfileStatus').classList.add('hidden');
+    const modal = document.getElementById('editProfileModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('editProfileModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function openPasswordModal() {
+    document.getElementById('changePasswordStatus').classList.add('hidden');
+    document.getElementById('changePasswordForm')?.reset();
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closePasswordModal() {
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function wireEditProfile(userId, initialUser) {
+    document.getElementById('editProfileBtn')?.addEventListener('click', () => openEditModal(initialUser));
+    document.getElementById('closeEditProfileBtn')?.addEventListener('click', closeEditModal);
+    document.getElementById('editProfileBackdrop')?.addEventListener('click', closeEditModal);
+
+    document.getElementById('editProfileForm')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const statusEl = document.getElementById('editProfileStatus');
+
+        const name = document.getElementById('editName').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const phone = document.getElementById('editPhone').value.trim();
+
+        try {
+            const updated = await updateProfileInfo(userId, { name, email, phone });
+            localStorage.setItem('driveRedUserSession', JSON.stringify(updated));
+            document.getElementById('profileName').textContent = updated.name || '-';
+            document.getElementById('profileEmail').textContent = updated.email || '-';
+            document.getElementById('profilePhone').textContent = updated.phone || '-';
+            statusEl.textContent = 'Saved successfully.';
+            statusEl.className = 'text-sm text-green-600';
+            statusEl.classList.remove('hidden');
+            setTimeout(() => {
+                closeEditModal();
+                window.location.reload();
+            }, 600);
+        } catch (error) {
+            console.error(error);
+            statusEl.textContent = 'Could not save changes.';
+            statusEl.className = 'text-sm text-red-600';
+            statusEl.classList.remove('hidden');
+        }
+    });
+}
+
+function wirePasswordChange(userId) {
+    document.getElementById('changePasswordBtn')?.addEventListener('click', openPasswordModal);
+    document.getElementById('closeChangePasswordBtn')?.addEventListener('click', closePasswordModal);
+    document.getElementById('changePasswordBackdrop')?.addEventListener('click', closePasswordModal);
+
+    document.getElementById('changePasswordForm')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const statusEl = document.getElementById('changePasswordStatus');
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        if (newPassword !== confirmNewPassword) {
+            statusEl.textContent = 'New password and confirmation do not match.';
+            statusEl.className = 'text-sm text-red-600';
+            statusEl.classList.remove('hidden');
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            statusEl.textContent = 'New password must be at least 8 characters.';
+            statusEl.className = 'text-sm text-red-600';
+            statusEl.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            await updatePassword(userId, { currentPassword, newPassword });
+            statusEl.textContent = 'Password updated successfully.';
+            statusEl.className = 'text-sm text-green-600';
+            statusEl.classList.remove('hidden');
+            setTimeout(closePasswordModal, 700);
+        } catch (error) {
+            console.error(error);
+            statusEl.textContent = 'Could not update password. Check current password and try again.';
+            statusEl.className = 'text-sm text-red-600';
+            statusEl.classList.remove('hidden');
+        }
+    });
+}
+
 async function initProfile() {
     const sessionUser = getSessionUser();
     if (!sessionUser?.id) {
@@ -112,6 +243,8 @@ async function initProfile() {
         const profile = await loadProfile(sessionUser.id);
         renderProfile(profile);
         wirePhotoUpload(sessionUser.id);
+        wireEditProfile(sessionUser.id, profile.user);
+        wirePasswordChange(sessionUser.id);
     } catch (error) {
         console.error(error);
         alert('Could not load profile data.');

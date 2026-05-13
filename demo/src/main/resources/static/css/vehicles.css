@@ -504,3 +504,40 @@
         border-top: 1px solid #ececec;
     }
 }
+
+/* Availability: booked / maintenance — still listed, not bookable */
+.car-card.is-unavailable .car-thumb {
+    filter: grayscale(0.2);
+    opacity: 0.92;
+}
+
+.car-card.is-unavailable .car-main h3 {
+    color: #6b7280;
+}
+
+.availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.availability-badge.maintenance {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.availability-badge.booked {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+}

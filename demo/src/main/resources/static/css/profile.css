@@ -36,6 +36,20 @@
     padding: 0.3rem 0.55rem;
 }
 
+.edit-profile-btn {
+    border: 1px solid var(--dark-red);
+    color: var(--dark-red);
+    border-radius: 9999px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.edit-profile-btn:hover {
+    background: var(--dark-red);
+    color: #fff;
+}
+
 .profile-stat-card {
     background: #fff;
     border: 1px solid #ececec;

@@ -599,10 +599,38 @@
                     <input type="text" id="bookingCustomer" required placeholder="Jane Smith" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Guest email (optional)</label>
+                    <input type="email" id="bookingGuestEmail" placeholder="guest@email.com" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Link app user (optional)</label>
+                    <select id="bookingLinkedUser" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                        <option value="">Guest only (no app account)</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-400 mb-1.5">Vehicle</label>
                     <select id="bookingVehicle" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
                         <option value="">Select a vehicle</option>
                     </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Plan type</label>
+                        <select id="bookingPlanType" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="DAILY">Daily</option>
+                            <option value="WEEKLY" selected>Weekly</option>
+                            <option value="MONTHLY">Monthly</option>
+                            <option value="YEARLY">Yearly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Payment</label>
+                        <select id="bookingPayment" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                            <option value="Cash">Cash</option>
+                            <option value="Visa">Visa</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -625,8 +653,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Total Amount ($)</label>
-                        <input type="number" id="bookingAmount" required placeholder="350" min="1" class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors">
+                        <label class="block text-sm font-medium text-gray-400 mb-1.5">Total (server recalculated)</label>
+                        <input type="number" id="bookingAmount" readonly placeholder="—" min="0" step="0.01" class="w-full bg-dark-600/80 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-accent transition-colors cursor-not-allowed">
                     </div>
                 </div>
                 <div class="flex gap-3 pt-2">
@@ -649,6 +677,13 @@
             </div>
             <form id="damageForm" onsubmit="saveDamage(event)" class="space-y-4">
                 <input type="hidden" id="damageEditId" value="">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1.5">Customer (reporter)</label>
+                    <select id="damageReporterUser" required class="w-full bg-dark-600 border border-dark-500 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors">
+                        <option value="">Select customer</option>
+                    </select>
+                </div>
 
                 <!-- Photo Upload -->
                 <div>
