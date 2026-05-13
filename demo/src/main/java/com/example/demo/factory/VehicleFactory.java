@@ -1,6 +1,7 @@
 package com.example.demo.factory;
 
 import com.example.demo.model.Vehicle;
+import com.example.demo.state.VehicleAvailability;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,7 +21,7 @@ public class VehicleFactory {
             throw new IllegalArgumentException("Vehicle payload is required");
         }
         if (fromRequest.getAvailabilityStatus() == null || fromRequest.getAvailabilityStatus().isBlank()) {
-            fromRequest.setAvailabilityStatus("Available");
+            fromRequest.setAvailabilityStatus(VehicleAvailability.AVAILABLE.persistenceCode());
         }
         VehicleCategoryProfile profile = VehicleCategoryProfile.fromCategory(fromRequest.getCategory());
         profile.applyMissingDefaults(fromRequest);

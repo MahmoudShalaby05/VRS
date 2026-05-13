@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.model.AppUser;
 import com.example.demo.model.RentalBooking;
 import com.example.demo.model.Vehicle;
+import com.example.demo.state.VehicleAvailability;
 import com.example.demo.repository.AppUserRepository;
 import com.example.demo.repository.RentalBookingRepository;
 import com.example.demo.repository.VehicleRepository;
@@ -241,8 +242,7 @@ public class BookingService {
     private Vehicle loadVehicleUnlessMaintenance(Long vehicleId) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
-        String st = vehicle.getAvailabilityStatus();
-        if (st != null && st.equalsIgnoreCase("Maintenance")) {
+        if (VehicleAvailability.fromDatabase(vehicle.getAvailabilityStatus()).isMaintenance()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vehicle is in maintenance and cannot be booked");
         }
         return vehicle;
@@ -250,8 +250,7 @@ public class BookingService {
 
     private Vehicle loadVehicleForPublicCheckout(Long vehicleId) {
         Vehicle vehicle = loadVehicleUnlessMaintenance(vehicleId);
-        String st = vehicle.getAvailabilityStatus();
-        if (st != null && st.equalsIgnoreCase("Booked")) {
+        if (VehicleAvailability.fromDatabase(vehicle.getAvailabilityStatus()).blocksPublicOnlineBooking()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This vehicle is not available for booking");
         }
         return vehicle;
@@ -275,12 +274,8 @@ public class BookingService {
         if (vehicle == null) {
             return;
         }
-        String current = vehicle.getAvailabilityStatus();
-        if (current != null && current.equalsIgnoreCase("Maintenance")) {
-            return;
-        }
         long active = rentalBookingRepository.countActiveReservations(vehicleId, LocalDate.now());
-        vehicle.setAvailabilityStatus(active > 0 ? "Booked" : "Available");
+        VehicleAvailability.refreshFromActiveReservationCount(vehicle, active);
         vehicleRepository.save(vehicle);
     }
 }
