@@ -34,6 +34,7 @@ Use these flows after any refactor to confirm nothing regressed.
 | Vehicle list / catalog | `static/vehicles.html` (or home flow that lists cars) |
 | Single vehicle page, specs without “daily allowance” in car details JS | `static/car-details.html?id=<vehicleId>` |
 | Compare / filters still work | Same catalog pages |
+| **Factory:** create vehicle via admin (full fields) — same as before; optional `POST /api/vehicles` with sparse body + `category: SUV` gets SUV defaults | Admin → Vehicles / API |
 
 ### 3. Checkout and pricing (Strategy pattern — **important**)
 
@@ -92,9 +93,23 @@ Below is what is **actually implemented** in code today (not a roadmap).
 
 ---
 
-### 2. Factory — vehicle types (not implemented)
+### 2. Factory — **vehicle category assembly** (implemented)
 
-There is no separate Factory abstraction for building different vehicle *types*; the app uses a single JPA entity `Vehicle` and repositories/controllers. If this pattern is added later, this README should be updated with package/class names.
+**Intent:** Centralize how a new `Vehicle` is assembled before persistence: pick a **category profile** (Sedan, SUV, Van, …) and apply **type-specific defaults** only where the client left fields null or blank—so a full admin payload behaves as before, while minimal API payloads still get sensible defaults.
+
+**Where:**
+
+| Piece | Path |
+|--------|------|
+| Category “products” (profiles / defaults per type) | `src/main/java/com/example/demo/factory/VehicleCategoryProfile.java` |
+| Factory entry point | `src/main/java/com/example/demo/factory/VehicleFactory.java` — `prepareNewVehicle(Vehicle)` |
+| Uses the factory | `src/main/java/com/example/demo/controller/VehicleController.java` — `POST` create calls `vehicleFactory.prepareNewVehicle(vehicle)` before `save` |
+
+**How to read it:** `VehicleCategoryProfile.fromCategory(...)` maps the request’s `category` string to an enum constant. `applyMissingDefaults` fills seats, transmission, fuel, engine, luggage, `dailyKm`, rating, match score, and badge **only** when missing. `VehicleFactory` also keeps the previous rule: default `availabilityStatus` to `"Available"` when omitted.
+
+**Quick test:** `POST /api/vehicles` with only `name`, `brand`, `category` (e.g. `"SUV"`), `modelYear`, `city`, `pricePerDay`, `imageUrl`, `description` — response should include SUV-style defaults (e.g. 7 seats). Repeat with a full body (admin form); values you send explicitly should not change.
+
+---
 
 ### 3. State — vehicle availability (not implemented)
 
@@ -108,7 +123,7 @@ Spring beans such as `BookingService` are singleton-scoped **by the framework** 
 
 ## After you add more patterns
 
-When Factory, State, or other patterns are introduced:
+When State or other patterns are introduced:
 
 1. Keep behavior backward-compatible or document breaking changes.
 2. Run the manual checklist above.

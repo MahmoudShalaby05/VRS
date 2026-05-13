@@ -39,6 +39,10 @@ function mapVehicleFromApi(vehicle) {
     const availabilityLower = availabilityRaw.toLowerCase();
     const bookable = availabilityLower !== "maintenance" && availabilityLower !== "booked";
 
+    const rawTransmission = (vehicle.transmission || "Automatic").trim();
+    const transmission =
+        rawTransmission.toLowerCase() === "auto" ? "Automatic" : rawTransmission;
+
     return {
         id: vehicle.id,
         name: vehicle.name,
@@ -48,7 +52,7 @@ function mapVehicleFromApi(vehicle) {
         modelYear: vehicle.modelYear,
         city: vehicle.city || "Cairo",
         seats: vehicle.seats ?? 5,
-        transmission: vehicle.transmission || "Automatic",
+        transmission,
         fuel: vehicle.fuel || "Petrol",
         engine: vehicle.engine || "1.6L",
         luggage: vehicle.luggage || "3 bags",

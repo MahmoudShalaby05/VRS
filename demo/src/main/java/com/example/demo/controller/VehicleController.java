@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.factory.VehicleFactory;
 import com.example.demo.model.Vehicle;
 import com.example.demo.repository.VehicleRepository;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,12 @@ import java.util.Set;
 public class VehicleController {
 
     private final VehicleRepository vehicleRepository;
+    private final VehicleFactory vehicleFactory;
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    public VehicleController(VehicleRepository vehicleRepository) {
+    public VehicleController(VehicleRepository vehicleRepository, VehicleFactory vehicleFactory) {
         this.vehicleRepository = vehicleRepository;
+        this.vehicleFactory = vehicleFactory;
     }
 
     @GetMapping
@@ -35,10 +38,7 @@ public class VehicleController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Vehicle createVehicle(@RequestBody Vehicle vehicle) {
-        if (vehicle.getAvailabilityStatus() == null || vehicle.getAvailabilityStatus().isBlank()) {
-            vehicle.setAvailabilityStatus("Available");
-        }
-        return vehicleRepository.save(vehicle);
+        return vehicleRepository.save(vehicleFactory.prepareNewVehicle(vehicle));
     }
 
     @PutMapping("/{id}")

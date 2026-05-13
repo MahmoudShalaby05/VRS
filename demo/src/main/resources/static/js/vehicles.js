@@ -100,7 +100,9 @@ function getCurrentCars() {
 
     const selectedBrand = document.getElementById("brandFilter")?.value || "all";
     if (selectedBrand !== "all") {
-        filtered = filtered.filter((car) => car.brand.toLowerCase() === selectedBrand.toLowerCase());
+        filtered = filtered.filter(
+            (car) => String(car.brand || "").toLowerCase() === selectedBrand.toLowerCase()
+        );
     }
 
     const maxModelYear = Number(document.getElementById("modelYearRange")?.value || "9999");
