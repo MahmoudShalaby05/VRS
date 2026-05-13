@@ -17,12 +17,10 @@
     <div id="navbar-container"></div>
 
     <section class="relative min-h-[82vh] flex items-center overflow-hidden">
-        <video class="hero-video" autoplay muted loop playsinline poster="http://static.photos/automotive/1280x720/9">
-            <source src="https://cdn.coverr.co/videos/coverr-aerial-view-of-road-1579/1080p.mp4" type="video/mp4">
-        </video>
-        <div class="hero-overlay"></div>
+        <video id="vehiclesHeroVideo" class="hero-video" autoplay muted loop playsinline preload="auto"></video>
+        <div class="hero-overlay" aria-hidden="true"></div>
 
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 w-full">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 w-full">
             <div class="grid lg:grid-cols-2 gap-10 items-center">
                 <div class="space-y-6">
                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white/90 text-sm">

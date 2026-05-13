@@ -4,7 +4,57 @@ let currentPage = 1;
 let currentCarsList = [];
 let CARS_DATA = [];
 
+const DEFAULT_HERO_MP4 =
+    "https://cdn.coverr.co/videos/coverr-aerial-view-of-road-1579/1080p.mp4";
+
+function applyHeroVideoUrl(video, mp4) {
+    if (!mp4) return;
+    video.removeAttribute("src");
+    while (video.firstChild) {
+        video.removeChild(video.firstChild);
+    }
+    video.src = mp4;
+    video.load();
+    video.play().catch(() => {});
+}
+
+async function fetchVehiclesHeroVideo() {
+    const video = document.getElementById("vehiclesHeroVideo");
+    if (!video) return;
+
+    video.addEventListener("error", () => {
+        const err = video.error;
+        console.warn(
+            "Hero video failed to load or play. Check Network tab for the mp4 URL and CORS/hosting.",
+            err ? { code: err.code, message: err.message } : {}
+        );
+    });
+
+    try {
+        const res = await fetch("/api/site-properties/vehicles-hero", { cache: "no-store" });
+        if (!res.ok) {
+            console.warn("Hero video API status:", res.status, "— using built-in fallback MP4.");
+            applyHeroVideoUrl(video, DEFAULT_HERO_MP4);
+            return;
+        }
+        const data = await res.json();
+        const mp4 = (data.mp4 && String(data.mp4).trim()) || DEFAULT_HERO_MP4;
+        const poster = data.poster && String(data.poster).trim();
+
+        applyHeroVideoUrl(video, mp4);
+        if (poster) {
+            video.poster = poster;
+        } else {
+            video.removeAttribute("poster");
+        }
+    } catch (e) {
+        console.warn("Could not load hero video config:", e, "— using built-in fallback MP4.");
+        applyHeroVideoUrl(video, DEFAULT_HERO_MP4);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+    await fetchVehiclesHeroVideo();
     try {
         CARS_DATA = await fetchVehicles();
     } catch (error) {

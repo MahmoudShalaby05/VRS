@@ -131,6 +131,63 @@ When State or other patterns are introduced:
 
 ---
 
+## Vehicles page hero video (stored in MySQL)
+
+The hero block on **`vehicles.html`** loads MP4 and optional poster URLs from the database so **any machine** using the same DB (or after you set the same rows on your friend’s DB) shows your video.
+
+### How it works
+
+| Piece | Path |
+|--------|------|
+| Table `site_properties` (created by Hibernate `ddl-auto=update`) | Entity `src/main/java/com/example/demo/model/SiteProperty.java` |
+| Read / write | `SitePropertyService`, `SitePropertyRepository` |
+| API | `src/main/java/com/example/demo/controller/SitePropertyController.java` |
+| Browser | `static/js/vehicles.js` — `fetchVehiclesHeroVideo()` calls `GET /api/site-properties/vehicles-hero` and updates `<video>` |
+
+**Keys:** `vehicles.hero.mp4` and `vehicles.hero.poster` (poster optional).
+
+### Set the video once (you or your friend)
+
+**Option A — HTTP (easiest after app is running)**
+
+```http
+PUT http://localhost:8080/api/site-properties/vehicles-hero
+Content-Type: application/json
+
+{
+  "mp4": "https://YOUR-CDN-OR-SERVER/path/to/video.mp4",
+  "poster": "https://YOUR-CDN-OR-SERVER/path/to/poster.jpg"
+}
+```
+
+You can send **only** `"mp4": "..."` in the PUT body if you do not need a custom poster.
+
+**Local files on your PC (`G:\...`, `C:\...`, `file:///...`)** — the browser **will not** load them for a page opened as `http://localhost:...` (you will see *Not allowed to load local resource*). Copy the MP4 and poster into `src/main/resources/static/hero-assets/`, restart the app, then store URLs like `http://localhost:8080/hero-assets/your-video.mp4` (see `static/hero-assets/README.txt`). The API `PUT` rejects `file:` and `X:\` style values with **400** and a short explanation.
+
+**Option B — SQL in MySQL Workbench** (`USE vrs_db;` first)
+
+```sql
+INSERT INTO site_properties (property_key, property_value)
+VALUES ('vehicles.hero.mp4', 'https://YOUR-CDN-OR-SERVER/path/to/video.mp4');
+
+INSERT INTO site_properties (property_key, property_value)
+VALUES ('vehicles.hero.poster', 'https://YOUR-CDN-OR-SERVER/path/to/poster.jpg');
+```
+
+If a row already exists, use `UPDATE site_properties SET property_value = 'https://...' WHERE property_key = 'vehicles.hero.mp4'` or the `PUT` above (upsert behavior).
+
+**Verify in Workbench:** `SELECT * FROM site_properties;` — columns must be **`property_key`** and **`property_value`**. The key must be exactly **`vehicles.hero.mp4`**. Wrong names or a typo used to mean the API returned `"mp4": null`. On **app startup**, if that key is missing or the value is blank, the server **inserts a default Coverr MP4** so `GET /api/site-properties/vehicles-hero` still returns a playable `mp4`. Replace it with your URL via `UPDATE` or `PUT` when ready. The browser also falls back to the same default if the API is unreachable.
+
+### Friend’s PC
+
+1. Same **code** (pull from Git).  
+2. Same **idea** for data: either **same database** (shared MySQL / dump restore) **or** they run the same **`PUT`** / **`INSERT`** on **their** `vrs_db` with the same URLs.  
+3. The MP4 URL must be **reachable from the browser** (HTTPS; `<video src>` does not use CORS the same way as XHR, but the host must allow the request).
+
+**Public URLs:** Hosting the file on **S3, Cloudinary, your own server, or GitHub raw** is fine as long as the URL returns `video/mp4` and allows playback.
+
+---
+
 ## Configuration
 
 Database and JPA settings: `src/main/resources/application.properties`.
