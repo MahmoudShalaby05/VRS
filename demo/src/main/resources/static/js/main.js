@@ -1,5 +1,7 @@
 // === Main Application Logic ===
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await initBrandStrip();
+
     // Wait for components to be loaded before initializing
     const initApp = () => {
         initRevealAnimations();
@@ -14,6 +16,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('componentsLoaded', initApp);
     }
 });
+
+async function initBrandStrip() {
+    const brandStrip = document.getElementById('brandStrip');
+    if (!brandStrip) return;
+
+    brandStrip.innerHTML = '<div class="brand-pill">Loading brands...</div>';
+
+    try {
+        const vehicles = await fetchVehicles();
+        const brands = [...new Set(vehicles.map((vehicle) => vehicle.brand).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b));
+
+        if (brands.length === 0) {
+            brandStrip.innerHTML = '<div class="brand-pill">No brands available</div>';
+            return;
+        }
+
+        const pills = brands
+            .map(
+                (brand) => `
+                    <button type="button" class="brand-pill" onclick="navigateToVehiclesByBrand('${brand}')" role="listitem">
+                        ${brand}
+                    </button>
+                `
+            )
+            .join('');
+
+        brandStrip.innerHTML = `
+            <div class="brand-strip-track" aria-hidden="true">
+                ${pills}${pills}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Failed to load brand strip:', error);
+        brandStrip.innerHTML = '<div class="brand-pill">Unable to load brands</div>';
+    }
+}
 
 // === Modal Functions ===
 function openModal(id) {
@@ -82,6 +121,11 @@ function handleSignup(event) {
 // === Navigation Functions ===
 function navigateToVehicles() {
     window.location.href = 'vehicles.html';
+}
+
+function navigateToVehiclesByBrand(brand) {
+    const encodedBrand = encodeURIComponent(String(brand).trim().toLowerCase());
+    window.location.href = `vehicles.html?brand=${encodedBrand}`;
 }
 
 function navigateToContact() {

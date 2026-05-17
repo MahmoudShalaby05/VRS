@@ -44,50 +44,7 @@
                         Flexible subscriptions, no long-term commitments. Choose from our premium fleet and drive away in minutes.
                     </p>
 
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 space-y-4 search-glass">
-                        <div class="grid sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-white/60 text-sm mb-1 block">Pick-up Location</label>
-                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
-                                    <i data-lucide="map-pin" class="w-4 h-4 text-darkRed"></i>
-                                    <input type="text" placeholder="Enter location" class="bg-transparent text-white placeholder-white/40 outline-none w-full text-sm">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-white/60 text-sm mb-1 block">Pick-up Date</label>
-                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
-                                    <i data-lucide="calendar" class="w-4 h-4 text-darkRed"></i>
-                                    <input type="date" class="bg-transparent text-white outline-none w-full text-sm date-input">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-white/60 text-sm mb-1 block">Return Date</label>
-                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
-                                    <i data-lucide="calendar" class="w-4 h-4 text-darkRed"></i>
-                                    <input type="date" class="bg-transparent text-white outline-none w-full text-sm date-input">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-white/60 text-sm mb-1 block">Vehicle Type</label>
-                                <div class="flex items-center gap-2 bg-white/10 rounded-xl px-4 py-3 border border-white/10">
-                                    <i data-lucide="car" class="w-4 h-4 text-darkRed"></i>
-                                    <select class="bg-transparent text-white outline-none w-full text-sm appearance-none">
-                                        <option value="" class="text-gray-900">All Types</option>
-                                        <option value="sedan" class="text-gray-900">Sedan</option>
-                                        <option value="suv" class="text-gray-900">SUV</option>
-                                        <option value="luxury" class="text-gray-900">Luxury</option>
-                                        <option value="sports" class="text-gray-900">Sports</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="navigateToVehicles()" class="w-full bg-darkRed hover:bg-red-800 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-red-900/40 flex items-center justify-center gap-2">
-                            <i data-lucide="search" class="w-5 h-5"></i>
-                            Search Vehicles
-                        </button>
-                    </div>
+                  
 
                     <div class="flex gap-8 pt-4">
                         <div>
@@ -120,13 +77,8 @@
     <!-- Brands Strip -->
     <section class="bg-gray-50 py-8 border-y border-gray-100">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-40">
-                <span class="text-2xl font-bold tracking-wider">TOYOTA</span>
-                <span class="text-2xl font-bold tracking-wider">BMW</span>
-                <span class="text-2xl font-bold tracking-wider">MERCEDES</span>
-                <span class="text-2xl font-bold tracking-wider">AUDI</span>
-                <span class="text-2xl font-bold tracking-wider">NISSAN</span>
-                <span class="text-2xl font-bold tracking-wider">HONDA</span>
+            <div class="brand-strip-wrapper">
+                <div id="brandStrip" class="brand-strip" aria-label="Popular brands" role="list"></div>
             </div>
         </div>
     </section>
@@ -255,91 +207,7 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-24 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <span class="text-darkRed font-semibold text-sm uppercase tracking-wider">Pricing Plans</span>
-                <h2 class="text-4xl md:text-5xl font-bold mt-3 mb-4">Simple & <span class="text-darkRed">Transparent</span> Pricing</h2>
-                <p class="text-gray-500 text-lg">No hidden fees. Choose the plan that works best for you.</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Daily -->
-                <div class="bg-white border-2 border-gray-100 rounded-3xl p-8 hover:border-darkRed/30 transition-all duration-300 hover:shadow-xl group">
-                    <div class="text-center mb-8">
-                        <i data-lucide="sun" class="w-10 h-10 text-darkRed mx-auto mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Daily</h3>
-                        <p class="text-gray-400 text-sm mb-4">Perfect for short trips</p>
-                        <div class="flex items-end justify-center gap-1">
-                            <span class="text-5xl font-black text-darkRed">$49</span>
-                            <span class="text-gray-400 mb-2">/day</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Basic insurance</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> 200km/day mileage</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Roadside assistance</li>
-                        <li class="flex items-center gap-3 text-gray-300"><i data-lucide="x" class="w-5 h-5"></i> Free delivery</li>
-                        <li class="flex items-center gap-3 text-gray-300"><i data-lucide="x" class="w-5 h-5"></i> Premium support</li>
-                    </ul>
-                    <button onclick="navigateToVehicles()" class="w-full border-2 border-darkRed text-darkRed hover:bg-darkRed hover:text-white py-3 rounded-xl font-semibold transition-all duration-300">
-                        Choose Plan
-                    </button>
-                </div>
-
-                <!-- Weekly - Popular -->
-                <div class="bg-darkRed text-white rounded-3xl p-8 relative shadow-2xl shadow-red-900/30 scale-105">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
-                        Most Popular
-                    </div>
-                    <div class="text-center mb-8">
-                        <i data-lucide="calendar" class="w-10 h-10 text-red-200 mx-auto mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Weekly</h3>
-                        <p class="text-red-200/70 text-sm mb-4">Best value for vacations</p>
-                        <div class="flex items-end justify-center gap-1">
-                            <span class="text-5xl font-black">$199</span>
-                            <span class="text-red-200/70 mb-2">/week</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Full insurance</li>
-                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Unlimited mileage</li>
-                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Roadside assistance</li>
-                        <li class="flex items-center gap-3 text-red-100"><i data-lucide="check" class="w-5 h-5 text-yellow-400"></i> Free delivery</li>
-                        <li class="flex items-center gap-3 text-red-300"><i data-lucide="x" class="w-5 h-5"></i> Premium support</li>
-                    </ul>
-                    <button onclick="navigateToVehicles()" class="w-full bg-white text-darkRed hover:bg-gray-100 py-3 rounded-xl font-semibold transition-all duration-300">
-                        Choose Plan
-                    </button>
-                </div>
-
-                <!-- Monthly -->
-                <div class="bg-white border-2 border-gray-100 rounded-3xl p-8 hover:border-darkRed/30 transition-all duration-300 hover:shadow-xl group">
-                    <div class="text-center mb-8">
-                        <i data-lucide="calendar-range" class="w-10 h-10 text-darkRed mx-auto mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">Monthly</h3>
-                        <p class="text-gray-400 text-sm mb-4">For the long haul</p>
-                        <div class="flex items-end justify-center gap-1">
-                            <span class="text-5xl font-black text-darkRed">$599</span>
-                            <span class="text-gray-400 mb-2">/month</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Full insurance</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Unlimited mileage</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Roadside assistance</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Free delivery</li>
-                        <li class="flex items-center gap-3 text-gray-600"><i data-lucide="check" class="w-5 h-5 text-darkRed"></i> Premium support</li>
-                    </ul>
-                    <button onclick="navigateToVehicles()" class="w-full border-2 border-darkRed text-darkRed hover:bg-darkRed hover:text-white py-3 rounded-xl font-semibold transition-all duration-300">
-                        Choose Plan
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
+              
     <!-- Testimonials Section -->
     <section id="testimonials" class="py-24 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -540,6 +408,7 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="js/components.js"></script>
+    <script src="js/vehicles-api.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

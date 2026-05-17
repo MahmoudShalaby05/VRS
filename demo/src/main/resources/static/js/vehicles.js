@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     initDynamicFilters();
     wireUi();
+    applyQueryParams();
     applyFilterAndSort();
     updateCompareUi();
     if (typeof lucide !== "undefined") {
@@ -373,4 +374,41 @@ function initDynamicFilters() {
     modelYearRange.max = String(maxYear);
     modelYearRange.value = String(maxYear);
     modelYearLabel.textContent = String(maxYear);
+}
+
+function getQueryParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}
+
+function applyQueryParams() {
+    const brandParam = getQueryParam("brand");
+    if (brandParam) {
+        const brandFilter = document.getElementById("brandFilter");
+        const normalized = String(brandParam).trim().toLowerCase();
+        if (brandFilter) {
+            const optionExists = Array.from(brandFilter.options).some(
+                (option) => option.value.toLowerCase() === normalized
+            );
+            if (optionExists) {
+                brandFilter.value = normalized;
+            }
+        }
+    }
+
+    const searchParam = getQueryParam("search");
+    if (searchParam) {
+        const carSearchInput = document.getElementById("carSearchInput");
+        if (carSearchInput) {
+            carSearchInput.value = String(searchParam).trim();
+        }
+    }
+
+    const categoryParam = getQueryParam("category");
+    if (categoryParam) {
+        const chip = document.querySelector(`.chip[data-filter="${categoryParam.toLowerCase()}"]`);
+        if (chip) {
+            document.querySelectorAll(".chip").forEach((el) => el.classList.remove("active"));
+            chip.classList.add("active");
+        }
+    }
 }
