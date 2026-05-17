@@ -84,6 +84,7 @@ VRS/                              ← Git repository root (this README)
         │   │   ├── DemoApplication.java      ← Entry point
         │   │   ├── config/                   ← Startup configuration
         │   │   ├── controller/               ← REST API
+        │   │   ├── dto/                      ← API request/response records
         │   │   ├── service/                  ← Business logic
         │   │   │   └── pricing/              ← Strategy pattern (pricing)
         │   │   ├── repository/               ← Spring Data JPA

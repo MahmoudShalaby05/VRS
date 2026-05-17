@@ -1,0 +1,5 @@
+# Copy to application-dev.properties and activate with:
+# spring.profiles.active=dev
+
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true

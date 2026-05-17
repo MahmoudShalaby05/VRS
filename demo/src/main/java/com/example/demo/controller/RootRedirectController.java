@@ -4,12 +4,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+/**
+ * Root redirects and health-style endpoints (replaces legacy TestController).
+ */
 @RestController
-public class TestController {
+public class RootRedirectController {
 
     @GetMapping("/api")
-    public String home() {
-        return "Spring Boot is working!";
+    public String apiHealth() {
+        return "DriveRed API is running";
     }
 
     @GetMapping("/vehicles")

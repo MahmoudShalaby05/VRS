@@ -22,18 +22,9 @@ async function fetchVehiclesHeroVideo() {
     const video = document.getElementById("vehiclesHeroVideo");
     if (!video) return;
 
-    video.addEventListener("error", () => {
-        const err = video.error;
-        console.warn(
-            "Hero video failed to load or play. Check Network tab for the mp4 URL and CORS/hosting.",
-            err ? { code: err.code, message: err.message } : {}
-        );
-    });
-
     try {
         const res = await fetch("/api/site-properties/vehicles-hero", { cache: "no-store" });
         if (!res.ok) {
-            console.warn("Hero video API status:", res.status, "— using built-in fallback MP4.");
             applyHeroVideoUrl(video, DEFAULT_HERO_MP4);
             return;
         }
@@ -47,8 +38,7 @@ async function fetchVehiclesHeroVideo() {
         } else {
             video.removeAttribute("poster");
         }
-    } catch (e) {
-        console.warn("Could not load hero video config:", e, "— using built-in fallback MP4.");
+    } catch {
         applyHeroVideoUrl(video, DEFAULT_HERO_MP4);
     }
 }

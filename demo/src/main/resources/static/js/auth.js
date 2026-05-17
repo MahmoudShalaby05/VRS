@@ -27,20 +27,6 @@ function togglePasswordVisibility(buttonId, inputId) {
     });
 }
 
-function getStoredUsers() {
-    try {
-        const stored = localStorage.getItem('driveRedUsers');
-        return stored ? JSON.parse(stored) : {};
-    } catch (error) {
-        console.error('Unable to read stored users:', error);
-        return {};
-    }
-}
-
-function saveStoredUsers(users) {
-    localStorage.setItem('driveRedUsers', JSON.stringify(users));
-}
-
 function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
